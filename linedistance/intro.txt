@@ -1,0 +1,10 @@
+
+In this experiment you will be presented with two pairs of lines for 500 ms.
+
+You are to decide which pair has the narrower distance between the lines.
+
+Use the keyboard and press:
+A-key if the left pair is narrower
+L-key if the right pair is the narrower
+
+Press space to start

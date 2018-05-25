@@ -1,0 +1,153 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# import modules --------------------------------------------------------------
+from __future__ import division  # handy tool for division
+
+import random
+
+from psychopy import visual, core, event, gui
+
+from mindwandering1 import *
+
+# Settings --------------------------------------------------------------------
+
+WinWidth = 1000     # Set window Width
+WinHeigth = 500     # Set window height
+FullScreen = True  # Set full screen (True/False)
+text_color = 'red'
+num_color = 'red'
+bg_color = 'black'
+
+
+# Set up window ---------------------------------------------------------------
+win = visual.Window(
+    size=(WinWidth, WinHeigth),
+    fullscr=FullScreen,
+    monitor='testMonitor',
+    allowGUI=None,
+    checkTiming=True,
+    color=bg_color
+)
+
+
+def initialise_components():
+    global mouse
+    global buttons
+    global routineTimer
+    global clock
+    global error_mess
+    global ISI
+    global clock_stim
+    global mindw
+    global wait_stim
+
+    mindw = mindw_class(win)
+
+    # Initialise mouse
+    mouse = event.Mouse(visible=False)
+    buttons = mouse.getPressed()
+
+    routineTimer = core.CountdownTimer()
+    clock = core.Clock()
+
+    error_mess = visual.TextStim(win,
+                                 text="False",
+                                 pos=(0, 0),
+                                 color=text_color)
+
+    clock_stim = visual.TextStim(win,
+                                 text=str(0.0)[:5],
+                                 pos=(0, 0),
+                                 alignHoriz='right',
+                                 color=num_color)
+
+    wait_stim = visual.TextStim(win,
+                                text=u'Vänta...')
+
+    ScreenHZ = win.getActualFrameRate(nIdentical=60,
+                                      nMaxFrames=100,
+                                      nWarmUpFrames=10,
+                                      threshold=1)
+
+    ISI = core.StaticPeriod(screenHz=ScreenHZ, win=win)
+
+
+def exp_PVT(minutes, seconds):
+    interval = random.uniform(0.2, 5)
+    t = 0
+    continueRoutine = True
+    count_start = False
+    routineTimer.reset()
+    routineTimer.add(minutes + seconds)
+    clock.reset()
+
+    while continueRoutine and routineTimer.getTime() > 0:
+        t = clock.getTime()
+
+        if t < interval and buttons[0]:
+            count_start = False
+            error_mess.draw()
+            win.flip()
+            ISI.start(2)
+            print("error")  # replace with proper logging
+            interval = random.uniform(0.2, 5)
+            mouse.clickReset()
+            ISI.complete()
+            clock.reset()
+            win.flip()
+
+        elif t > interval and not buttons[0]:
+            count_start = True
+            clock.reset()
+
+            while count_start is True:
+                count = clock.getTime()
+                if count < 1:
+                    clock_stim.setText(str(count*1000)[:3])
+                else:
+                    clock_stim.setText(str(count)[:5])
+                clock_stim.draw()
+                win.flip()
+
+                if buttons[0]:
+                    reaction_time = str(count)
+                    count_start = False
+                    clock_stim.draw()
+                    win.flip()
+                    ISI.start(2)
+                    print(count)  # replace with proper logging
+                    mouse.clickReset()
+                    interval = random.uniform(0.2, 5)
+                    ISI.complete()
+                    clock.reset()
+                    win.flip()
+                    break
+
+        elif event.getKeys(keyList=["escape"]):
+            core.quit()
+
+
+def mind_wandering():
+    global mw_score
+    global mw_rt
+    mindw.wait()
+    win.flip()
+    mindw.mindw_rating()
+    mw_score = mindw.return_response()[0]
+    mw_rt = mindw.return_response()[1]
+    print(mw_score)  # replace with proper logging
+    print(mw_rt)  # replace with proper logging
+    win.flip()
+    core.wait(1)
+
+
+initialise_components()
+
+
+pvt_min = [1, 0, 1, 1]
+pvt_sec = [30, 30, 30, 30]
+
+for i in range(len(pvt_min)):
+    exp_PVT(pvt_min[i], pvt_sec[i])  # (minutes, seconds)
+    mind_wandering()

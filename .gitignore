@@ -1,0 +1,19 @@
+
+# Ignore Mac files
+.DS_Store
+
+# ignore data files
+data/
+
+# ignore image files
+images/
+*.jpg
+*.bmp
+*.png
+
+# ignore other files
+*.pyc
+*.pxm
+
+# ignore backup
+Backup/

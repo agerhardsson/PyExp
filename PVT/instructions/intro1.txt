@@ -1,0 +1,9 @@
+Detta är ett reaktionstest
+
+Du kommer se röda siffror dyka upp på skärmen som räknar uppåt.
+
+Tryck på vänster musknapp så fort du ser siffrorna på skärmen.
+
+Trycker du för tidigt visas ett felmeddelande.
+
+(Tryck vänster musknapp för att gå vidare)

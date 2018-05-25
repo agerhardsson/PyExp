@@ -1,0 +1,1 @@
+condition	picture_id	picturetraining	1	001APREN.jpgtraining	2	002APREN.jpgtraining	3	003APREN.jpgtraining	4	004APREN.jpgtraining	5	005APREN.jpgtraining	6	006APREN.jpg
