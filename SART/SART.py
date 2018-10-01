@@ -1,266 +1,208 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Jun 27 22:05:30 2015
-Sustained Attention to Response Task & Vigalance Task
+from psychopy import core
+from random import shuffle, sample
+import collections
+import time
+import instructions
+import mylogging
+import gui
 
-@author: erik @ marsja dot se
-"""
+# dialog box must be before importing psychopy visual and event
+dlg = gui.GUI('SART')
+expinfo = dlg.start()
+# for testing
+# expinfo = {'subject_id': 'test',
+#            'expName': 'SART'}
 
-from psychopy import visual, core, data, sound, gui, event
-import glob, os
 
-from random import shuffle
+class sart():
 
-class Experiment():
-    '''
-    Two tasks;
+    def __init__(self,
+                 digits=16,
+                 nTrials=225,
+                 numTime=.250,
+                 maskTime=.900,
+                 fullscreen=False):
 
-    1)Sustained Attention To Response task
-    Robertson et al., (1997)
-    x digits (x pairs of x digits)
-    Each digit is presented for 250 Msec followed by a 900 Msec mask
-    (Mask= ring with diaognoal cross in the middle, diameter=29mm).
-
-    Digit 3 is no response digit, prefixed quasi-randomly distributed among x trials
-
-    Digit onset-to-onset 1150 ms
-
-    2)Vigilance task (modified SART)
-    Same as above but responses on digit 3 only (withold on all other digits)
-    '''
-
-    def __init__(self, digits, nTrials, name):
-        #Should look this over and probably change it
-        self.name = name
+        self.digits = sample([1, 2, 4, 5, 6, 7, 8, 9, 1, 2, 4, 5, 6, 7, 8, 9],
+                             digits-1)
+        self.digits.append(3)
         self.nDigits = digits
-        self.digits = range(1,digits+1)
         self.trials = nTrials
+        self.numTime = numTime
+        self.maskTime = maskTime
+        self.FullScreen = fullscreen
+        self.globalClock = core.Clock()
+
+    def MRI(self):
+        from psychopy.hardware.emulator import launchScan
+        MR_settings = {
+            'TR': 2.000,  # duration (sec) per volume
+            'volumes': 210,  # number of whole-brain 3D volumes / frames
+            'sync': 't',  # character to use as the sync timing event;
+                          # assumed to come at start of a volume
+            'skip': 4,  # number of volumes lacking a sync pulse at start of
+                        # scan (for T1 stabilization)
+            'sound': False,
+            }
+        launchScan(
+            self.win, MR_settings,
+            mode=expinfo['mode'],
+            globalClock=self.globalClock)
+
+    # def triggerIN(self):
+    #     # future function to send a trigger
+    #     input = 10
 
     def createTrials(self):
-        '''Creates a list of trials.
-        '''
         trials = []
-        for trialSequence in range(self.trials/self.nDigits):
+        for trialSequence in range(self.trials//self.nDigits):
             shuffled = self.digits[:]
             shuffle(shuffled)
             trials.append(shuffled)
         return trials
 
-    def experimentWindow(self, color):
-        '''For creating the experiment window
-        in preferred color
-        self.color = color
-        '''
-        self.win = visual.Window(size=(1920, 1200), fullscr=True, screen=0,
-                                 allowGUI=False, allowStencil=False,
-            monitor=u'testMonitor', color=color, colorSpace=u'rgb',
-            blendMode=u'avg',winType=u'pyglet')
-        return self.win
-
-    def createTextStimulus(self, win, text, pos, name, height, color):
-        '''Creates  text stimulu1,
-        self.text = text
-        self.pos = pos
-        self.name = name
-        self.height = height
-        self.color = color'''
-        self.text = text
-        self.pos = pos
-        self.name = name
-        self.height = height
-        self.color = color
-        textStimulus = visual.TextStim(win=self.win, ori=0, name=self.name,
-            text=self.text,    font=u'Arial',
-            pos=self.pos, height=self.height,
-            color=self.color, colorSpace=u'rgb')
-        return textStimulus
-
-    def presentStimulus(self, stim, target):
-        self.stimulus = stim
-        self.target = target
-        self.win.flip()
-        if self.stimulus == "text":
-            self.textOnScreen.setText(target)
-            self.textOnScreen.draw()
-        elif self.stimulus == "image":
-            self.target.draw()
-        elif self.stimulus == "sound":
-            '''here we will we play the sound
-            NOT IMPLEMENTED YET
-            '''
-            self.target.play()
-
-    def experimentTrials(self, trials, expinfo):
-        self.exp = expinfo
-        self.trialList = []
-        self.correctresp = 'space'
+    def experimentTrials(self, trials):
+        # self.exp = expinfo
+        self.trialList = []  # change to dict?
 
         for trialSequence in trials:
             for trial, digit in enumerate(trialSequence):
-                trial +=1
-                if digit == 3:
-                    if self.expinfo['Task'] == 'SART':
-                        self.correctresp = u'Noresponse'
-                    elif self.expinfo['Task'] == 'Vigilance':
-                        self.correctresp = u'space'
+                trial += 1
 
+                if digit != 3:
+                    type = 'Go'
                 else:
-                    if self.expinfo['Task'] == 'SART':
-                        self.correctresp = u'space'
-                    elif self.expinfo['Task'] == 'Vigilance':
-                        self.correctresp = u'Noresponse'
+                    type = 'NoGo'
 
-                self.trialList.append({'Cresp':self.correctresp,
-                                       u'Stimulus':digit, u'Trial':trial,
-                                       u'Sub_id':self.exp['Subject Id'],
-                                         u'Age':self.exp['Age'],
-                                         u'Sex':self.exp['Sex'],
-                                         u'Date':self.exp['date'],
-                                         u'Task':self.expinfo['Task']})
-        self.trialHandler = data.TrialHandler(self.trialList,1, method="sequential")
-        self.trialHandler.data.addDataType('Response')
-        self.trialHandler.data.addDataType('Accuracy')
-        self.trialHandler.data.addDataType('RT')
-        return self.trialHandler
+                dataList = collections.OrderedDict()
+                dataList['subject_id'] = expinfo['subject_id']
+                dataList['Task'] = expinfo['expName']
+                dataList['Date'] = time.strftime("%Y%m%d")
+                dataList['Time'] = time.strftime("%H:%M:%S")
+                dataList['TimeStamp'] = 0
+                # dataList['GlobalTime'] = self.globalClock.getTime()
+                dataList['Trial'] = 0
+                dataList['Type'] = type
+                dataList['Stimulus'] = digit
+                dataList['Response'] = 0
+                dataList['RT'] = 0
+                dataList['Accuracy'] = 0
 
-    def experimentInfo(self):
-        self.expName = u'Sustained attention'
-        self.expInfo = {'Subject Id':'', 'Age':'', 'ExpVersion': 0.2,
-                        'Sex': ['Male', 'Female'], 'Task':['SART', 'Vigilance']}
-        self.expInfo[u'date'] = data.getDateStr(format="%Y-%m-%d_%H:%M")
-        self.infoDlg = gui.DlgFromDict(dictionary=self.expInfo,
-                                       title=self.expName, fixed=['ExpVersion'])
-        self.datafile = u'Data' + os.path.sep + u'DATA_SART.csv'
-        if self.infoDlg.OK:
-            return self.expInfo
-        else:
-            return 'Cancelled'
+                self.trialList.append(dataList)
+
+        return self.trialList
+
+    def createStim(self):
+        from psychopy import visual
+
+        stimuli = {}
+        stimuli['number'] = visual.TextStim(self.win, text='')
+        stimuli['mask'] = visual.SimpleImageStim(self.win,
+                                                 image='stim/MaskCircle.png')
+        return stimuli
+
+    def responseType(self):
+        from psychopy import event
+        resp = event.getKeys(keyList=['space'])
+        return resp
+
+    def mindwandering(self):
+        import mindwandering
+        atProbesList = [20, 40, 80, 100, 120, 140, 160, 180, 200, 220]
+        self.mw = mindwandering.mw(self.win)
+        return atProbesList
 
     def runTrials(self, trialObj):
+        from psychopy import event
         self.trialhandler = trialObj
+        self.countTrials = 0
         self.timer = core.Clock()
-        self.targetFrames = int(self.frameR * .25)
-        self.itiFrames = int(self.frameR * .9)
+        stim = self.createStim()
+        self.targetFrames = int(self.frameR * self.numTime)
+        self.itiFrames = int(self.frameR * self.maskTime)
+        self.log.createFile(self.trialhandler[0])
+        self.mwProbeList = self.mindwandering()
+        core.wait(1.0)
+
         for trial in self.trialhandler:
             self.timer.reset()
+            self.countTrials += 1  # add 1 to count
+            trial['Time'] = time.strftime("%H:%M:%S")
+            trial['Trial'] = self.countTrials
+
+            stim['number'].setText(trial['Stimulus'])
+            # stim['number'].setSize() vary size??????????????????
             for frame in range(self.targetFrames):
-                    visualTarget = trial['Stimulus']
-                    self.presentStimulus('text', visualTarget)
+                stim['number'].draw()
+                self.win.flip()
             for frame in range(self.itiFrames):
-                    self.presentStimulus('image', self.mask)
-                    keys = event.getKeys(keyList=['space'])
-                    if keys:
-                        trial['RT'] = self.timer.getTime()
-                        if keys[0] == trial['Cresp']:
-                            trial['Accuracy'] = 1
-                        else:
-                            trial['Accuracy'] = 0
+                response = self.responseType()
+                stim['mask'].draw()
+                self.win.flip()
 
-            trial['RT'] = self.timer.getTime()
-            trial['Accuracy'] = 0
-            self.writeCsv(self.datafile, trial)
+                if response:
+                    # event.clearEvents()
+                    trial['RT'] = self.timer.getTime()
+                    trial['Response'] = 1
+                    if trial['Type'] == 'Go':
+                        trial['Accuracy'] = 1
+                    elif trial['Type'] == 'NoGo':
+                        trial['Accuracy'] = 0
 
-    def writeCsv(self,fileName, thisTrial):
-        import codecs, csv, os
-        fullPath = os.path.abspath(fileName)
-        if not os.path.isfile(fullPath):
-            with codecs.open(fullPath, 'ab+', encoding='utf8') as f:
-                csv.writer(f, delimiter=';').writerow(thisTrial.keys())
-                csv.writer(f, delimiter=';').writerow(thisTrial.values())
-        else:
-            with codecs.open(fullPath, 'ab+', encoding='utf8') as f:
-                csv.writer(f, delimiter=';').writerow(thisTrial.values())
-    def makeDir(self, dirname):
-        import os
-        if not os.path.isdir(dirname):
-            os.makedirs(dirname)
+            trial['TimeStamp'] = self.globalClock.getTime()
+            self.log.append(trial)
 
-    def runExperiment(self):
-        self.makeDir('Data')
-        self.expinfo = self.experimentInfo()
-        if self.expinfo == 'Cancelled':
-            print 'User cancelled'
-            core.quit()
+            if any(probe == self.countTrials for probe in self.mwProbeList):
+                mwResp = self.mw.rating()
+                trial['Response'] = mwResp['Response']
+                trial['RT'] = mwResp['RT']
+                trial['Type'] = 'mw'
+                trial['Stimulus'] = 0
+                self.log.append(trial)
 
-        self.win = self.experimentWindow(color = 'black')
+            if event.getKeys(keyList=["escape"]):
+                core.quit()
+
+    def instructions(self):
+        instr = instructions.instructions(self.win)
+        return instr
+
+    def logging(self):
+        log = mylogging.log()
+        return log
+
+    def expWindow(self, size=(1280, 800), color='black'):
+        from psychopy import visual
+        self.win = visual.Window(size=size,
+                                 fullscr=self.FullScreen,
+                                 screen=0,
+                                 allowGUI=False,
+                                 allowStencil=False,
+                                 monitor='testMonitor',
+                                 color=color,
+                                 colorSpace='rgb',
+                                 winType='pyglet')
+
+        self.win.mouseVisable = False
+        return self.win
+
+    def startexp(self):
+        self.win = self.expWindow()
+        self.instr = self.instructions()
         self.frameR = self.win.getActualFrameRate()
-
         if not self.frameR:
             self.frameR = 60.0
-
-        self.load = preLoading()
-        self.files = self.load.loadFiles("Stimuli", "png", "image", self.win)
-        self.txtfiles = self.load.loadFiles("Stimuli", "txt", "text", self.win)
-        self.mask = self.files['circleMask'][0]
-        self.textOnScreen = self.createTextStimulus(self.win, text='',
-                                         pos=[0.0,0.0], name='Visual Target',
-                                         height=0.07, color='White')
-        self.txtfiles[self.expinfo['Task']].draw()
-        self.win.flip()
-        event.waitKeys()
-        event.clearEvents()
+        self.MRI()  # wait for MRI pulse
+        print(self.globalClock.getTime())
+        self.instr.start('intro1')
         self.trials = self.createTrials()
-        trialsToRun = self.experimentTrials(self.trials, self.expinfo)
+        trialsToRun = self.experimentTrials(self.trials)
+        self.log = self.logging()
         self.runTrials(trialsToRun)
-        core.quit()
 
-class preLoading():
 
-    def __init__(self):
-        self.path = os.getcwd()
-
-    def loadFiles(self, directory,extension,fileType,win='',whichFiles='*',stimList=[]):
-        """ Load all the pics and sounds"""
-        self.dir = directory
-        self.extension = extension
-        self.fileType = fileType
-        self.wi = win
-        self.whichFiles = whichFiles
-        self.stimList=stimList
-
-        if isinstance(self.extension,list):
-            fileList = []
-            for curExtension in self.ext:
-                print self.whichFiles
-                fileList.extend(glob.glob(
-                                        os.path.join(self.path,
-                                                       self.directory,
-                                                       self.whichFiles+curExtension)))
-        else:
-            fileList = glob.glob(os.path.join(self.path,directory,self.whichFiles+self.extension))
-            fileMatrix = {} #initialize fileMatrix  as a dict because it'll be accessed by picture names, cound names, whatver
-        for num,curFile in enumerate(fileList):
-            fullPath = curFile
-            fullFileName = os.path.basename(fullPath)
-            stimFile = os.path.splitext(fullFileName)[0]
-            if fileType=="image":
-                from psychopy import visual
-                try:
-                    surface = pygame.image.load(fullPath) #gets height/width of the image
-                    stim = visual.SimpleImageStim(win, image=fullPath)
-                    fileMatrix[stimFile] = ((stim,fullFileName,num,surface.get_width(),surface.get_height(),stimFile))
-                except: #no pygame, so don't store the image dims
-                    stim = visual.SimpleImageStim(win, image=fullPath)
-                    fileMatrix[stimFile] = ((stim,fullFileName,num,'','',stimFile))
-            elif fileType=="sound":
-                soundRef = sound.Sound(fullPath)
-                fileMatrix[stimFile] = ((soundRef))
-            elif fileType=='text':
-                from psychopy import visual
-                import codecs
-                with codecs.open(fullPath, 'r', encoding='utf8') as f:
-                    textRef = visual.TextStim(win, text=f.read(), wrapWidth=1.2, alignHoriz='center', alignVert='center', height=0.06)
-
-                fileMatrix[stimFile] = ((textRef))
-
-        #check
-        if stimList and set(fileMatrix.keys()).intersection(stimList) != set(stimList):
-            popupError(str(set(self.stimList).difference(fileMatrix.keys())) + " does not exist in " + self.path+'\\'+directory)
-
-        return fileMatrix
-def main():
-    test = Experiment(digits=9, nTrials=225, name="Sustained Attention")
-    test.runExperiment()
-
-if __name__ == "__main__":
-    main()
+if expinfo != 'User pressed cancel':
+    run = sart(fullscreen=True)
+    run.startexp()

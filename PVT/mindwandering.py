@@ -1,17 +1,17 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from __future__ import division
 from psychopy import event, visual, core
-import time
 
 quest1 = (u'Välj det alternativ nedan som bäst beskriver din\n'
-         u' upplevelse just nu (precis innan denna fråga).')
+          u' upplevelse just nu (precis innan denna fråga).')
 
 alt1 = u'1. Jag fokuserade på uppgiften.'
 alt2 = u'2. Jag tänkte på hur jag presterade på uppgiften.'
 alt3 = u'3. Jag tänkte inte på någonting.'
-alt4 = u'4. Jag märkte att jag började tänka på annat medan jag gjorde uppgiften.'
+alt4 = (u'4. Jag märkte att jag började tänka på annat medan'
+        u'jag gjorde uppgiften.')
 alt5 = (u'5. Jag tänkte på andra saker under uppgiften\n'
         u'     men jag var inte medveten om det förrän jag blev frågad.')
 
@@ -22,37 +22,49 @@ class mindw_class():
                  win,
                  textcol='white'):
 
-        self.win=win
-        self.left=-0.5
-        self.top=0.2
-        self.right=-0.5
-        self.bottom=-0.2
-        self.txsize=0.1
-        self.textcol=textcol
+        self.win = win
+        self.left = -0.5
+        self.top = 0.2
+        self.right = -0.5
+        self.bottom = -0.2
+        self.txsize = 0.1
+        self.textcol = textcol
 
-        self.mouse = visual.CustomMouse(win=self.win,
-                                   leftLimit=self.left,
-                                   topLimit=self.top,
-                                   rightLimit=self.right,
-                                   bottomLimit=self.bottom,
-                                   pointer=None,
-                                   visible=False)
+    def createStim(self):
 
-        self.mouse.pointer = visual.TextStim(win=self.win,
-                                        text='O',
-                                        color='black',
-                                        height=self.txsize,
-                                        alignHoriz='center',
-                                        alignVert='center'
-                                        )
-        self.wait_stim = visual.TextStim(win=self.win,
-                                    text=u'Vänta...',
-                                    alignHoriz='center',
-                                    height=0.06,
-                                    wrapWidth=1.8,
-                                    color=textcol)
+        stimuli = {}
+        stimuli['mouse'] = visual.CustomMouse(
+            win=self.win,
+            leftLimit=self.left,
+            topLimit=self.top,
+            rightLimit=self.right,
+            bottomLimit=self.bottom,
+            pointer=None,
+            visible=False)
+
+        # stimuli['mouse.pointer'] = visual.TextStim(
+        #     win=self.win,
+        #     text='O',
+        #     color='black',
+        #     height=self.txsize,
+        #     alignHoriz='center',
+        #     alignVert='center')
+
+        stimuli['spot'] = visual.Circle(
+            win=self.win,
+            radius=0.035,
+            lineColor=self.textcol,
+            lineWidth=3)
+
+        stimuli['wait_stim'] = visual.TextStim(
+            win=self.win,
+            text=u'Vänta...',
+            alignHoriz='center',
+            height=0.06,
+            wrapWidth=1.8,
+            color=self.textcol)
+
         self.mindw_scale = []
-
         self.text = visual.TextStim(
             win=self.win,
             text=quest1,
@@ -60,10 +72,9 @@ class mindw_class():
             pos=[self.right, self.top*1.6],
             height=0.06,
             wrapWidth=1.8,
-            color=textcol)
+            color=self.textcol)
 
         self.mindw_scale.append(self.text)
-
 
         self.text = visual.TextStim(
             win=self.win,
@@ -72,7 +83,7 @@ class mindw_class():
             pos=[self.right, self.top],
             height=0.06,
             wrapWidth=1.8,
-            color=textcol)
+            color=self.textcol)
 
         self.mindw_scale.append(self.text)
 
@@ -83,7 +94,7 @@ class mindw_class():
             pos=[self.right, self.top-0.1],
             height=0.06,
             wrapWidth=1.8,
-            color=textcol)
+            color=self.textcol)
 
         self.mindw_scale.append(self.text)
 
@@ -94,7 +105,7 @@ class mindw_class():
             pos=[self.right, self.top-0.2],
             height=0.06,
             wrapWidth=1.8,
-            color=textcol)
+            color=self.textcol)
 
         self.mindw_scale.append(self.text)
 
@@ -105,7 +116,7 @@ class mindw_class():
             pos=[self.right, self.top-0.3],
             height=0.06,
             wrapWidth=1.8,
-            color=textcol)
+            color=self.textcol)
 
         self.mindw_scale.append(self.text)
 
@@ -116,14 +127,9 @@ class mindw_class():
             pos=[self.right, self.top-0.44],
             height=0.06,
             wrapWidth=1.8,
-            color=textcol)
+            color=self.textcol)
 
         self.mindw_scale.append(self.text)
-
-        self.spot = visual.Circle(win=self.win,
-                                  radius=0.035,
-                                  lineColor=textcol,
-                                  lineWidth=3)
 
         self.routine_time = core.Clock()
 
@@ -170,22 +176,23 @@ class mindw_class():
             if event.getKeys(keyList=["escape"]):
                 core.quit()
 
+
 # --------------------- Example -----------------------------------------------
-# win = visual.Window(
-#     fullscr=True,
-#     monitor='testMonitor',
-#     allowGUI=None,
-#     checkTiming=True,
-#     color='black'
-# )
-# #
-# # subject_id = 2
-# mindw = mindw_class(win)
+win = visual.Window(
+    fullscr=True,
+    monitor='testMonitor',
+    allowGUI=None,
+    checkTiming=True,
+    color='black'
+)
 #
-#
-# # mindw.wait()
-# mindw.mindw_rating()
-# mindw_score = mindw.return_response()[0]
-# mindw_rt = mindw.return_response()[1]
-# print mindw_score
-# print mindw_rt
+# subject_id = 2
+mindw = mindw_class(win)
+
+
+# mindw.wait()
+mindw.mindw_rating()
+mindw_score = mindw.return_response()[0]
+mindw_rt = mindw.return_response()[1]
+print(mindw_score)
+print(mindw_rt)

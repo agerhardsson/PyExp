@@ -97,7 +97,7 @@ class Experiment():
 
         for trialSequence in trials:
             for trial, digit in enumerate(trialSequence):
-                trial +=1
+                trial += 1
                 if digit == 3:
                     if self.expinfo['Task'] == 'SART':
                         self.correctresp = u'Noresponse'

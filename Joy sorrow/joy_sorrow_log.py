@@ -1,6 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-import time, os
+
+import time
+import os
 
 row = 1
 current_block = 0
@@ -10,6 +12,7 @@ block = '0'
 directory = "data/"
 if not os.path.exists(directory):
     os.makedirs(directory)
+
 
 # Functions that control stimuli presentation ---------------------------------
 def next_block():
@@ -42,6 +45,7 @@ def find(search_key):
         else:
             count += 1
 
+
 def log_event(in_answer, in_rt, in_time_stamp, in_trial):
     picture_id = str(all_blocks[current_block][row - 1][find('picture_id')])
     picture = str(all_blocks[current_block][row - 1][find('picture')])
@@ -64,9 +68,10 @@ def log_event(in_answer, in_rt, in_time_stamp, in_trial):
         + picture_id + '\t'  # picture id
         + picture + '\t'  # picture name
         + answer + '\t'  # answer
-        + rt + '\n' # time to response
+        + rt + '\n'  # time to response
     )
     f.close()
+
 
 # Initiate log file -----------------------------------------------------------
 def log_init(in_version, in_load_set, in_subject_id, in_run_training):

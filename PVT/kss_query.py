@@ -218,7 +218,6 @@ class kss_class():
                 core.quit()
 
 
-
 # --------------------- Example -----------------------------------------------
 # win = visual.Window(
 #     fullscr=False,

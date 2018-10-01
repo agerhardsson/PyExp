@@ -3,15 +3,9 @@
 
 # import modules --------------------------------------------------------------
 from __future__ import division  # handy tool for division
-
-import time, os
-
 from psychopy import visual, core, event
-
 from joso_setup import *
-
 from joy_sorrow_log import *
-
 import scales
 
 # Settings --------------------------------------------------------------------
@@ -22,8 +16,8 @@ FullScreen = True
 text_size = 0.07
 BGcol = 'black'
 
-# Max experiment time
-max_time = 30 # in minutes
+# Max experiment time in minutes
+max_time = 30
 
 # Inter stimuli interval
 isi = 0.500
@@ -53,19 +47,19 @@ win = visual.Window(
     color=BGcol
 )
 
-# initialize components --------------------------------------------------------
+# initialize components -------------------------------------------------------
 
 instruction_texts = instructions()
 
 # add additional instructions to dictionary
 instruction_texts['training_start'] = u'Först en träningsomgång!'
-instruction_texts['training_end'] =  u'Slut på träning'
+instruction_texts['training_end'] = u'Slut på träning'
 
 # scales -----------------------------------------------------------------
 kss = scales.kss(win, subject_id=subject_id, use_mouse=False)
 panas = scales.panas(win, subject_id=subject_id, textheight=0.05)
 
-# Create Stim objects ----------------------------------------------------------
+# Create Stim objects ---------------------------------------------------------
 instruction_object = visual.TextStim(
     win=win,
     text='',
@@ -120,35 +114,36 @@ rs = visual.RatingScale(
     markerStart=5,
     lineColor='white',
     leftKeys='left',
-    rightKeys = 'right',
+    rightKeys='right',
     acceptKeys='down',
     pos=[0.0, -0.7],
     showAccept=False
     )
 
-# Frame rate  for ISI ----------------------------------------------------------
+# Frame rate  for ISI ---------------------------------------------------------
 ScreenHZ = win.getActualFrameRate(nIdentical=60,
                                   nMaxFrames=100,
                                   nWarmUpFrames=10,
                                   threshold=1)
 
 ISI = core.StaticPeriod(screenHz=ScreenHZ, win=win)
-print "Frame Rate: " + str(ScreenHZ)
+print("Frame Rate: " + str(ScreenHZ))
 
-# Create timers ----------------------------------------------------------------
+# Create timers ---------------------------------------------------------------
 routineTimer = core.CountdownTimer()
 expTimer = core.CountdownTimer()
 routine_time = core.Clock()
 
-# Define instructions function -------------------------------------------------
-def instructions(instr, time=60):
+
+# Define instructions function ------------------------------------------------
+def instructions(instr, time_s=60):
     win.setMouseVisible(False)
     event.clearEvents(eventType='keyboard')
 
     instruction_object.setText(instruction_texts[instr])
 
     routineTimer.reset()
-    routineTimer.add(time)
+    routineTimer.add(time_s)
 
     while not event.getKeys(keyList=['space']):
         instruction_object.draw()
@@ -159,6 +154,7 @@ def instructions(instr, time=60):
             core.quit()
 
     core.wait(0.5)
+
 
 # Fixation cross --------------------------------------------------------------
 def fixation_cross():
@@ -226,8 +222,8 @@ def main_block(n_trials):
         log_event(answer, rt, time_stamp, trial)
         ISI.complete()
 
-# Run experiment --------------------------------------------------------------
 
+# Run experiment --------------------------------------------------------------
 def run_main_exp():
     log_init(version, load_set, subject_id, run_training)
     panas.draw()
@@ -237,7 +233,7 @@ def run_main_exp():
     expTimer.add(max_time*60)
 
     # Training block
-    if run_training == True:
+    if run_training:
         instructions('intro2')
         instructions('training_start', 3)
         main_block(5)
@@ -262,6 +258,7 @@ def run_main_exp():
     panas.logFile()
     kss.logFile()
     instructions('end')             # Instruction
+
 
 run_main_exp()
 

@@ -3,9 +3,9 @@
 import os
 from psychopy import core
 
+
 # File reading/writing functions experiment -------------------
 # Check if data folder exist, else create it
-
 def instructions():
     directory = 'instructions/'
 
@@ -19,6 +19,7 @@ def instructions():
 
     return instruction_texts
 
+
 # Load participant list
 def check_participants(participant):
     directory = "data/"
@@ -30,7 +31,7 @@ def check_participants(participant):
     filename = str(participant) + ".txt"
     for file in os.listdir("data/"):
         if file.endswith(".txt"):
-            ppt = file # [11:] remove first 10 characters (date) of text file
+            ppt = file  # [11:] remove first 10 characters (date) of text file
             ppt_list.append(ppt)
             for ppt in ppt_list:
                 if filename == ppt:
@@ -39,13 +40,12 @@ def check_participants(participant):
 
 
 def run_setup(useGui=False):
-    if useGui == False:
-
+    if not useGui:
         while True:
             participant = input('Participant ID: ')
             if str(participant) == '':
                 print('A least one field is empty')
-            elif check_participants(participant)  > 0:
+            elif check_participants(participant) > 0:
                 print('Participant already exist!')
             else:
                 break
@@ -72,7 +72,7 @@ def run_setup(useGui=False):
             else:
                 print('Not a valid response (y/n)')
 
-    elif useGui == True:
+    elif useGui:
         from psychopy import gui
         # show information box:
         while True:
@@ -92,7 +92,7 @@ def run_setup(useGui=False):
                 warning = gui.Dlg(title='Warning')
                 warning.addText('A least one field is empty')
                 warning.show()
-            elif check_participants(participant)  > 0:
+            elif check_participants(participant) > 0:
                 warning = gui.Dlg(title='Warning')
                 warning.addText('Participant already exist!')
                 warning.show()

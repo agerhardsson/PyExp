@@ -1,9 +1,12 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-import time, os
+
+import time
+import os
 from psychopy import visual, core, event
 
-# Text settings ----------------------------------------------------------------
+
+# Text settings ---------------------------------------------------------------
 class erq:
     def __init__(self,
                  win,
@@ -222,10 +225,8 @@ class erq:
                 )
         f.close()
 
-
-
-# -- Demo ----------------------------------------------------------------------
-### Comment out to test ###
+# -- Demo ---------------------------------------------------------------------
+# Comment out to test #
 # ppt = raw_input('Participant: ')
 # win = visual.Window()
 # p = erq(win, ppt, 'english', 'today')
