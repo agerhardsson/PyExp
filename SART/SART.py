@@ -8,6 +8,7 @@ import instructions
 import mylogging
 import gui
 
+
 # dialog box must be before importing psychopy visual and event
 dlg = gui.GUI('SART')
 expinfo = dlg.start()
@@ -49,11 +50,13 @@ class sart():
         launchScan(
             self.win, MR_settings,
             mode=expinfo['mode'],
-            globalClock=self.globalClock)
+            globalClock=self.globalClock,
+            log=False)
 
     # def triggerIN(self):
     #     # future function to send a trigger
-    #     input = 10
+    #        StimTracker
+
 
     def createTrials(self):
         trials = []
@@ -81,7 +84,8 @@ class sart():
                 dataList['Task'] = expinfo['expName']
                 dataList['Date'] = time.strftime("%Y%m%d")
                 dataList['Time'] = time.strftime("%H:%M:%S")
-                dataList['TimeStamp'] = 0
+                dataList['GlobalTimeStamp'] = 0
+                dataList['trialTimeStamp'] = 0
                 # dataList['GlobalTime'] = self.globalClock.getTime()
                 dataList['Trial'] = 0
                 dataList['Type'] = type
@@ -127,16 +131,14 @@ class sart():
         core.wait(1.0)
 
         for trial in self.trialhandler:
-            self.timer.reset()
-            self.countTrials += 1  # add 1 to count
-            trial['Time'] = time.strftime("%H:%M:%S")
-            trial['Trial'] = self.countTrials
-
             stim['number'].setText(trial['Stimulus'])
+            self.timer.reset()
             # stim['number'].setSize() vary size??????????????????
+
             for frame in range(self.targetFrames):
                 stim['number'].draw()
                 self.win.flip()
+                trial['GlobalTimeStamp'] = self.globalClock.getTime()
             for frame in range(self.itiFrames):
                 response = self.responseType()
                 stim['mask'].draw()
@@ -150,8 +152,12 @@ class sart():
                         trial['Accuracy'] = 1
                     elif trial['Type'] == 'NoGo':
                         trial['Accuracy'] = 0
-
-            trial['TimeStamp'] = self.globalClock.getTime()
+                elif not response and trial['Type'] == 'NoGo':
+                    trial['Accuracy'] = 1
+            self.countTrials += 1  # add 1 to count
+            trial['trialTimeStamp'] = self.timer.getTime()
+            trial['Time'] = time.strftime("%H:%M:%S")
+            trial['Trial'] = self.countTrials
             self.log.append(trial)
 
             if any(probe == self.countTrials for probe in self.mwProbeList):
@@ -194,7 +200,7 @@ class sart():
         self.frameR = self.win.getActualFrameRate()
         if not self.frameR:
             self.frameR = 60.0
-        self.MRI()  # wait for MRI pulse
+        # self.MRI()  # wait for MRI pulse
         print(self.globalClock.getTime())
         self.instr.start('intro1')
         self.trials = self.createTrials()

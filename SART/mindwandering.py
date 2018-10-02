@@ -37,6 +37,11 @@ class mw():
         self.pos['alt3'] = [self.pos['right'], self.pos['top']-0.2]
         self.pos['alt4'] = [self.pos['right'], self.pos['top']-0.3]
         self.pos['alt5'] = [self.pos['right'], self.pos['top']-0.44]
+        self.pos['key1'] = [self.pos['right']+0.01, self.pos['top']]
+        self.pos['key2'] = [self.pos['right']+0.01, self.pos['top']-0.1]
+        self.pos['key3'] = [self.pos['right']+0.01, self.pos['top']-0.2]
+        self.pos['key4'] = [self.pos['right']+0.01, self.pos['top']-0.3]
+        self.pos['key5'] = [self.pos['right']+0.01, self.pos['top']-0.4]
 
         self.win.mouseVisable = False
 
@@ -149,19 +154,19 @@ class mw():
     def keyAnswer(self):
         if '1' in self.theseKeys or 'num_1' in self.theseKeys:
             keyResp = '1'
-            self.stimuli['spot'].setPos(newPos=self.pos['alt1'])
+            self.stimuli['spot'].setPos(newPos=self.pos['key1'])
         elif '2' in self.theseKeys or 'num_2' in self.theseKeys:
             keyResp = '2'
-            self.stimuli['spot'].setPos(newPos=self.pos['alt2'])
+            self.stimuli['spot'].setPos(newPos=self.pos['key2'])
         elif '3' in self.theseKeys or 'num_3' in self.theseKeys:
             keyResp = '3'
-            self.stimuli['spot'].setPos(newPos=self.pos['alt3'])
+            self.stimuli['spot'].setPos(newPos=self.pos['key3'])
         elif '4' in self.theseKeys or 'num_4' in self.theseKeys:
             keyResp = '4'
-            self.stimuli['spot'].setPos(newPos=self.pos['alt4'])
+            self.stimuli['spot'].setPos(newPos=self.pos['key4'])
         elif '5' in self.theseKeys or 'num_5' in self.theseKeys:
             keyResp = '5'
-            self.stimuli['spot'].setPos(newPos=self.pos['alt5'])
+            self.stimuli['spot'].setPos(newPos=self.pos['key5'])
         # self.win.flip()
         return keyResp
 

@@ -1,9 +1,11 @@
 
-# Ignore Mac files
+# Ignore Mac and cashe files
 .DS_Store
+_pycashe_
 
 # ignore data files
 data/
+
 
 # ignore image files
 images/

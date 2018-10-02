@@ -60,6 +60,8 @@ class instructions():
             self.win.flip()
             if event.getKeys(keyList=['escape']):
                 core.quit()
+        core.wait(0.3)
+        self.win.flip()
         core.wait(self.waitAfter)
 
 
