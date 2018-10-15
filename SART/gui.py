@@ -3,6 +3,7 @@
 
 import tkinter as tk
 import time
+import os
 
 
 class GUI():
@@ -12,6 +13,22 @@ class GUI():
         self.width = width
         self.height = height
 
+    def check_participants(self):
+        self.ppt_exists = False
+        ppt_count = 0
+        ppt_list = []
+        filename = str(self.participant) + ".txt"
+        for file in os.listdir("data/"):
+            if file.endswith(".txt"):
+                ppt = file[9:]  # remove first 10 characters (date) of file
+                ppt_list.append(ppt)
+                for ppt in ppt_list:
+                    if filename == ppt:
+                        ppt_count += 1
+        if ppt_count > 0:
+            self.ppt_exists = True
+        return self.ppt_exists
+
     def close_gui(self):
         self.buttonPress = 'Cancel'
         self.root.destroy()
@@ -19,14 +36,17 @@ class GUI():
     def start_exp(self):
         self.participant = str(self.subj.get())
         self.version = str(self.vers.get())
-        self.mode = str(self.mode.get(self.mode.curselection()))
-        if len(self.participant) < 1:
-            print('Fill in particpant')
-        elif len(self.version) < 1:
-            print('Fill in version')
-        elif len(self.participant) > 0 and len(self.version) > 0:
-            self.buttonPress = 'OK'
-            self.root.destroy()
+        self.mri = self.var.get()
+        print(self.var.get())
+        print(self.subj.get())
+        if not self.check_participants():
+            if len(self.participant) < 1:
+                print('Fill in particpant')
+            elif len(self.version) < 1:
+                print('Fill in version')
+            elif len(self.participant) > 0 and len(self.version) > 0:
+                self.buttonPress = 'OK'
+                self.root.destroy()
 
     def createBox(self):
 
@@ -44,11 +64,11 @@ class GUI():
         self.subj = tk.Entry(self.frame)
         self.lab_vers = tk.Label(self.frame, text='Version:')
         self.vers = tk.Entry(self.frame)
-        self.lab_mode = tk.Label(self.frame, text='Mode:')
-        self.mode = tk.Entry(self.frame)
-        self.mode = tk.Listbox(self.frame, height=2)
-        self.mode.insert(1, 'Test')
-        self.mode.insert(2, 'Scan')
+        self.var = tk.BooleanVar(value=True)
+        self.mode = tk.Checkbutton(self.frame,
+                                   text='MRI',
+                                   state='active',
+                                   variable=self.var)
         self.lab_date = tk.Label(self.frame, text='Date:')
         self.date = tk.Label(self.frame, text=time.strftime("%Y-%m-%d"))
         self.lab_time = tk.Label(self.frame, text='Time:')
@@ -56,7 +76,6 @@ class GUI():
 
         self.lab_subj.grid(row=1, sticky='e')
         self.lab_vers.grid(row=2, sticky='e')
-        self.lab_mode.grid(row=3, sticky='e')
         self.lab_date.grid(row=4, sticky='e')
         self.lab_time.grid(row=5, sticky='e')
 
@@ -102,7 +121,7 @@ class GUI():
                           'expName': self.expName,
                           'subject_id': self.participant,
                           'version': self.version,
-                          'mode': self.mode}
+                          'mri': self.mri}
         return self.input
 
     def start(self):
@@ -117,5 +136,4 @@ class GUI():
 #
 # gui = GUI(expName='SART')
 # ExpInfo = gui.start()
-#
 # print(ExpInfo)

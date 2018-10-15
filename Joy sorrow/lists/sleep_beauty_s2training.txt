@@ -1,1 +1,0 @@
-condition	picture_id	picturetraining	1	trainingc24.bmptraining	2	trainingc49.bmptraining	3	trainingc139.bmptraining	4	trainingc162.bmptraining	5	trainingc241.bmp

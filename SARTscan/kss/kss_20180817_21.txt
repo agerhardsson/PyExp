@@ -1,2 +1,0 @@
-subject_id	date	time	kss_answer	reaction_time
-21	17/08/2018	09:12:11	5.0	3.70497179031

@@ -11,7 +11,7 @@ class instructions():
     def __init__(self, window, text_size=0.07,
                  wrapWidth=1.8, color='white',
                  folderName='instructions',
-                 key='space', waitAfter=0.5):
+                 key=['space'], waitAfter=0.5):
         self.tSize = text_size
         self.wrapWidth = wrapWidth
         self.color = color
@@ -55,7 +55,7 @@ class instructions():
 
         instruction_object.setText(instruction_texts[self.instr])
 
-        while not event.getKeys(keyList=[self.key]):
+        while not event.getKeys(keyList=self.key):
             instruction_object.draw()
             self.win.flip()
             if event.getKeys(keyList=['escape']):

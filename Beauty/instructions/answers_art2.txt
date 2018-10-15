@@ -1,6 +1,0 @@
-0 - Nästan aldrig
-1 - År
-2 - Halvår
-3 - Varannan Månad
-4 - Månad
-5 - Vecka
