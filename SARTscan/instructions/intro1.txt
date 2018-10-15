@@ -1,0 +1,7 @@
+﻿I det här testet kommer du få se en siffra (1-9). Den kommer att visas i mitten av skärmen och en kort stund.
+
+Siffran följs av en ikryssad cirkel.
+
+Din uppgift är att trycka med pekfingret för alla siffror UTOM siffran 3.
+
+(Tryck på med pekfingret (röd) för att starta)

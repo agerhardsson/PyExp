@@ -20,6 +20,9 @@ expinfo = dlg.start()
 class sart():
 
     def __init__(self,
+                 screen_size=(1440, 900),
+                 screen_color='black',
+                 mri_scan=True,
                  digits=16,
                  nTrials=550,
                  numTime=.250,
@@ -34,6 +37,9 @@ class sart():
         self.numTime = numTime
         self.maskTime = maskTime
         self.FullScreen = fullscreen
+        self.screen_size = screen_size
+        self.screen_color = screen_color
+        self.mri_scan = mri_scan
         self.globalClock = core.Clock()
 
     def MRI(self):
@@ -41,9 +47,9 @@ class sart():
         MR_settings = {
             'TR': 2.000,  # duration (sec) per volume
             'volumes': 210,  # number of whole-brain 3D volumes / frames
-            'sync': 't',  # character to use as the sync timing event;
+            'sync': 's',  # character to use as the sync timing event;
                           # assumed to come at start of a volume
-            'skip': 4,  # number of volumes lacking a sync pulse at start of
+            'skip': 0,  # number of volumes lacking a sync pulse at start of
                         # scan (for T1 stabilization)
             'sound': False,
             }
@@ -89,15 +95,15 @@ class sart():
                 dataList['Trial'] = 0
                 dataList['Type'] = type
                 dataList['Stimulus'] = digit
-                dataList['Response'] = '.'
-                dataList['RT'] = '.'
-                dataList['Accuracy'] = '.'
-                dataList['multiResp'] = '.'
-                dataList['multiRT'] = '.'
-                dataList['dualWhereResp'] = '.'
-                dataList['dualWhereRT'] = '.'
-                dataList['dualAwareResp'] = '.'
-                dataList['dualAwareRT'] = '.'
+                dataList['Response'] = '0'
+                dataList['RT'] = ''
+                dataList['Accuracy'] = '0'
+                dataList['multiResp'] = ''
+                dataList['multiRT'] = ''
+                dataList['dualWhereResp'] = ''
+                dataList['dualWhereRT'] = ''
+                dataList['dualAwareResp'] = ''
+                dataList['dualAwareRT'] = ''
 
                 self.trialList.append(dataList)
 
@@ -107,19 +113,31 @@ class sart():
         from psychopy import visual
 
         stimuli = {}
-        stimuli['number'] = visual.TextStim(self.win, text='')
+        stimuli['number'] = visual.TextStim(self.win, text='', height=0.2)
         stimuli['mask'] = visual.SimpleImageStim(self.win,
                                                  image='stim/MaskCircle.png')
         return stimuli
 
     def responseType(self):
         from psychopy import event
-        resp = event.getKeys(keyList=['space'])
+        if self.mri_scan:
+            resp = event.getKeys(keyList=['4', '3'])
+        else:
+            resp = event.getKeys(keyList=['a', 'l', 'space'])
         return resp
 
     def mindwandering(self):
         import mindwandering
-        atProbesList = [20, 40, 80, 100, 120, 140, 160, 180, 200, 220]
+        # atProbesList = [20, 40, 80, 100, 120, 140, 160, 180, 200, 220]
+        if expinfo['Version'] == 1:
+            atProbesList = [27, 52, 81, 95, 120, 153, 208, 242, 300, 437]
+        elif expinfo['Version'] == 2:
+            atProbesList = [27, 52, 81, 95, 120, 153, 208, 242, 300, 437]
+        elif expinfo['Version'] == 3:
+            atProbesList = [27, 52, 81, 95, 120, 153, 208, 242, 300, 437]
+        elif expinfo['Version'] == 4:
+            atProbesList = [27, 52, 81, 95, 120, 153, 208, 242, 300, 437]
+
         self.mw = mindwandering.mwDual(self.win)
         return atProbesList
 
@@ -149,26 +167,31 @@ class sart():
                 self.win.flip()
 
                 if response:
-                    # event.clearEvents()
-                    trial['RT'] = self.timer.getTime()
                     trial['Response'] = '1'
+                    trial['RT'] = self.timer.getTime()
+
+                if trial['Response'] == '1':
                     if trial['Type'] == 'Go':
                         trial['Accuracy'] = '1'
                     elif trial['Type'] == 'NoGo':
                         trial['Accuracy'] = '0'
-                elif not response and trial['Type'] == 'NoGo':
-                    trial['Accuracy'] = '1'
+
+                elif trial['Response'] == '0':
+                    if trial['Type'] == 'Go':
+                        trial['Accuracy'] = '0'
+                    elif trial['Type'] == 'NoGo':
+                        trial['Accuracy'] = '1'
+
             self.countTrials += 1  # add 1 to count
             trial['trialTimeStamp'] = self.timer.getTime()
             trial['Time'] = time.strftime("%H:%M:%S")
-
-            # self.log.append(trial)
+            trial['Trial'] = self.countTrials
+            self.log.append(trial)
 
             if any(probe == self.countTrials for probe in self.mwProbeList):
                 mwResp = self.mw.rating()
                 trial['Type'] = mwResp['Type']
                 if mwResp['Type'] == 'MWdual':
-                    trial['Response'] = '1'
                     trial['dualWhereResp'] = mwResp['Response where']
                     trial['dualAwareResp'] = mwResp['Response aware']
                     trial['dualWhereRT'] = mwResp['RT where']
@@ -177,31 +200,30 @@ class sart():
                     trial['multiResp'] = mwResp['Response']
                     trial['multiRT'] = ['RT']
 
-                trial['Stimulus'] = '0'
-
-            trial['Trial'] = self.countTrials
-            self.log.append(trial)
+                trial['Stimulus'] = ''
+                self.log.append(trial)
 
             if event.getKeys(keyList=["escape"]):
                 core.quit()
 
     def instructions(self):
-        instr = instructions.instructions(self.win)
+        instr = instructions.instructions(self.win, text_size=0.09,
+                                          key=['4', '3', 'space'])
         return instr
 
     def logging(self):
         log = mylogging.log()
         return log
 
-    def expWindow(self, size=(1280, 800), color='black'):
+    def expWindow(self):
         from psychopy import visual
-        self.win = visual.Window(size=size,
+        self.win = visual.Window(size=self.screen_size,
                                  fullscr=self.FullScreen,
                                  screen=0,
                                  allowGUI=False,
                                  allowStencil=False,
                                  monitor='testMonitor',
-                                 color=color,
+                                 color=self.screen_color,
                                  colorSpace='rgb',
                                  winType='pyglet')
 
@@ -214,15 +236,19 @@ class sart():
         self.frameR = self.win.getActualFrameRate()
         if not self.frameR:
             self.frameR = 60.0
-        self.MRI()  # wait for MRI pulse
-        print(self.globalClock.getTime())
         self.instr.start('intro1')
         self.trials = self.createTrials()
         trialsToRun = self.experimentTrials(self.trials)
         self.log = self.logging()
+        if self.mri_scan:
+            self.MRI()  # wait for MRI pulse
+            print(self.globalClock.getTime())
+        else:
+            self.globalClock.reset()
         self.runTrials(trialsToRun)
+        self.instr.start('end')
 
 
 if expinfo != 'User pressed cancel':
-    run = sart(fullscreen=True)
+    run = sart(fullscreen=True, screen_size=(1440, 900), mri_scan=True)
     run.startexp()

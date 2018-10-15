@@ -1,0 +1,49 @@
+IAPS Number 	IAPSjpg	Valence	Desc
+1440	1440.jpg	Pleasant	Seal
+1460	1460.jpg	Pleasant	Baby tiger
+1610	1610.jpg	Pleasant	Bunny
+1710	1710.jpg	Pleasant	Puppies
+1750	1750.jpg	Pleasant	Bunnies
+1811	1811.jpg	Pleasant	Monkeys
+1920	1920.jpg	Pleasant	Porpoise
+1999	1999.jpg	Pleasant	Mickey
+2057	2057.jpg	Pleasant	Baby (1)
+2070	2070.jpg	Pleasant	Baby (2)
+2209	2209.jpg	Pleasant	Woman & Girl
+2340	2340.jpg	Pleasant	Family
+2540	2540.jpg	Pleasant	Mom & child
+2550	2550.jpg	Pleasant	Couple
+2655	2655.jpg	Pleasant	Kid and dog
+5470	5470.jpg	Pleasant	Austronaut
+5760	5760.jpg	Pleasant	Lake
+5830	5830.jpg	Pleasant	Ocean
+5831	5831.jpg	Pleasant	Seagulls
+7325	7325.jpg	Pleasant	Watermelon
+7330	7330.jpg	Pleasant	Sunday
+7502	7502.jpg	Pleasant	Castle
+8370	8370.jpg	Pleasant	Rafting
+8501	8501.jpg	Pleasant	Money
+1111	1111.jpg	UnPleasant	Snakes
+1220	1220.jpg	UnPleasant	Spider
+1275	1275.jpg	UnPleasant	Roaches
+1301	1301.jpg	UnPleasant	Dog
+2110	2110.jpg	UnPleasant	Angry face
+2722	2722.jpg	UnPleasant	Jail
+2900	2900.jpg	UnPleasant	Crying boy
+3160	3160.jpg	UnPleasant	Eye infection
+3181	3181.jpg	UnPleasant	Battered woman
+3300	3300.jpg	UnPleasant	Sick child
+3301	3301.jpg	UnPleasant	Bandaged boy
+6190	6190.jpg	UnPleasant	Gun and hand
+6610	6610.jpg	UnPleasant	Gun
+8230	8230.jpg	UnPleasant	Bloody boxer
+9230	9230.jpg	UnPleasant	Oil fire
+9300	9300.jpg	UnPleasant	Dirty toilet
+9340	9340.jpg	UnPleasant	Garbage (1)
+9390	9390.jpg	UnPleasant	Garbage (2)
+9470	9470.jpg	UnPleasant	Ruins
+9561	9561.jpg	UnPleasant	Injured kitty
+9584	9584.jpg	UnPleasant	Dental work
+9594	9594.jpg	UnPleasant	Needle
+9810	9810.jpg	UnPleasant	KKK
+9920	9920.jpg	UnPleasant	Burnt car

@@ -113,7 +113,7 @@ class GUI():
 
 
 # Example ------------------------------------
-#
+# 
 #
 # gui = GUI(expName='SART')
 # ExpInfo = gui.start()
