@@ -1,7 +1,7 @@
 
-# Ignore Mac and cashe files
+# Ignore Mac and cache files
 .DS_Store
-_pycashe_
+__pycache__
 
 # ignore data files
 data/

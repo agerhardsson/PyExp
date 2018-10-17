@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import tkinter as tk
+import tkMessageBox
 import time
 import os
 
@@ -17,10 +18,10 @@ class GUI():
         self.ppt_exists = False
         ppt_count = 0
         ppt_list = []
-        filename = str(self.participant) + ".txt"
+        filename = str(self.participant)
         for file in os.listdir("data/"):
             if file.endswith(".txt"):
-                ppt = file[9:]  # remove first 10 characters (date) of file
+                ppt = file[9:-4]  # remove first 10 characters (date) and .txt
                 ppt_list.append(ppt)
                 for ppt in ppt_list:
                     if filename == ppt:
@@ -34,11 +35,15 @@ class GUI():
         self.root.destroy()
 
     def start_exp(self):
-        self.participant = str(self.subj.get())
-        self.version = str(self.vers.get())
+        self.version = format(int(self.vers.curselection()[0] + 1), '02d')
+        self.session = format(int(self.sess.get()), '02d')
+        self.participant = str(format(int(self.subj.get()), '04d') + "_" +
+                               self.session)
         self.mri = self.var.get()
-        print(self.var.get())
-        print(self.subj.get())
+        if self.check_participants():
+            # tk.messagebox.showinfo("Warning", "Subject already exists") # P3
+            tkMessageBox.showwarning("Warning",
+                                     "Subject already exists for that session")
         if not self.check_participants():
             if len(self.participant) < 1:
                 print('Fill in particpant')
@@ -63,12 +68,20 @@ class GUI():
         self.lab_subj = tk.Label(self.frame, text='Participant:')
         self.subj = tk.Entry(self.frame)
         self.lab_vers = tk.Label(self.frame, text='Version:')
-        self.vers = tk.Entry(self.frame)
+        self.vers = tk.Listbox(self.frame, height=5)
+        self.vers.insert(1, '1')
+        self.vers.insert(2, '2')
+        self.vers.insert(3, '3')
+        self.vers.insert(4, '4')
+        self.vers.insert(5, 'Training')
+        self.lab_sess = tk.Label(self.frame, text='Session:')
+        self.sess = tk.Entry(self.frame)
         self.var = tk.BooleanVar(value=True)
+        self.lab_mode = tk.Label(self.frame, text='MRI:')
         self.mode = tk.Checkbutton(self.frame,
-                                   text='MRI',
                                    state='active',
-                                   variable=self.var)
+                                   variable=self.var,
+                                   )
         self.lab_date = tk.Label(self.frame, text='Date:')
         self.date = tk.Label(self.frame, text=time.strftime("%Y-%m-%d"))
         self.lab_time = tk.Label(self.frame, text='Time:')
@@ -76,22 +89,25 @@ class GUI():
 
         self.lab_subj.grid(row=1, sticky='e')
         self.lab_vers.grid(row=2, sticky='e')
-        self.lab_date.grid(row=4, sticky='e')
-        self.lab_time.grid(row=5, sticky='e')
+        self.lab_sess.grid(row=3, sticky='e')
+        self.lab_mode.grid(row=4, sticky='e')
+        self.lab_date.grid(row=5, sticky='e')
+        self.lab_time.grid(row=6, sticky='e')
 
         self.subj.grid(row=1, column=1)
         self.vers.grid(row=2, column=1)
-        self.mode.grid(row=3, column=1)
-        self.date.grid(row=4, column=1)
-        self.time.grid(row=5, column=1)
+        self.sess.grid(row=3, column=1)
+        self.mode.grid(row=4, column=1, sticky='w')
+        self.date.grid(row=5, column=1)
+        self.time.grid(row=6, column=1)
 
         self.buttonOK = tk.Button(self.frame, text='OK', state='normal',
                                   command=self.start_exp)
         self.buttonCancel = tk.Button(self.frame, text='Cancel',
                                       command=self.close_gui)
 
-        self.buttonCancel.grid(row=6, column=0, sticky='w')
-        self.buttonOK.grid(row=6, column=1, sticky='e')
+        self.buttonCancel.grid(row=7, column=0, sticky='w')
+        self.buttonOK.grid(row=7, column=1, sticky='e')
 
         self.center(self.root)
 
@@ -121,6 +137,7 @@ class GUI():
                           'expName': self.expName,
                           'subject_id': self.participant,
                           'version': self.version,
+                          'session': self.session,
                           'mri': self.mri}
         return self.input
 

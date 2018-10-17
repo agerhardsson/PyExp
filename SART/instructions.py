@@ -46,6 +46,7 @@ class instructions():
         instruction_object = visual.TextStim(
             win=self.win,
             text='',
+            alignHoriz='center',
             font=u'Arial',
             height=self.tSize,
             wrapWidth=self.wrapWidth,

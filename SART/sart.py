@@ -27,7 +27,9 @@ class sart():
                  maskTime=.900,
                  fullscreen=False):
 
-        self.trials = nTrials
+        self.ntrials = nTrials
+        if expinfo['version'] == '05':
+            self.ntrials = 47
         self.numTime = numTime
         self.maskTime = maskTime
         self.FullScreen = fullscreen
@@ -57,19 +59,19 @@ class sart():
     # Create trial lists based on pre-defined lists on text-files
     def createTrials(self):
         # import trial lists
-        if expinfo['version'] == '1':
+        if expinfo['version'] == '01':
             f = open('lists/list_1.txt', 'r')
-        elif expinfo['version'] == '2':
+        elif expinfo['version'] == '02':
             f = open('lists/list_2.txt', 'r')
-        elif expinfo['version'] == '3':
+        elif expinfo['version'] == '03':
             f = open('lists/list_3.txt', 'r')
-        elif expinfo['version'] == '4':
+        elif expinfo['version'] == '04':
             f = open('lists/list_4.txt', 'r')
-        elif expinfo['version'] == '5':
-            f = open('lists/list_5.txt', 'r')
+        elif expinfo['version'] == '05':
+            f = open('lists/list_training.txt', 'r')
 
         trials = f.read().split('\n')
-        return trials
+        return trials[0:self.ntrials]
 
     # def createTrials(self):
         # For future, create a python randomizer
@@ -80,15 +82,16 @@ class sart():
         self.trialList = []  # change to dict?
         for digit in trials:
 
-            if digit == 3:
+            if digit == '3':
                 type = 'NoGo'
-            elif digit == 0:
+            elif digit == '0':
                 type = 'MW'
             else:
                 type = 'Go'
 
             dataList = collections.OrderedDict()
-            dataList['subject_id'] = expinfo['subject_id']
+            dataList['subject_id'] = expinfo['subject_id'][:4]
+            dataList['Session'] = expinfo['session']
             dataList['Task'] = expinfo['expName']
             dataList['Version'] = expinfo['version']
             dataList['Date'] = time.strftime("%Y%m%d")
@@ -117,9 +120,18 @@ class sart():
         from psychopy import visual
 
         stimuli = {}
-        stimuli['number'] = visual.TextStim(self.win, text='', height=0.2)
-        stimuli['mask'] = visual.SimpleImageStim(self.win,
-                                                 image='stim/MaskCircle.png')
+        stimuli['number'] = visual.TextStim(
+            self.win,
+            text='',
+            height=0.2)
+        stimuli['mask'] = visual.SimpleImageStim(
+            self.win,
+            image='stim/MaskCircle125.png')
+        # stimuli['mask'] = visual.ImageStim(
+        #     self.win,
+        #     image='stim/MaskCircle125.png'
+        # )
+
         return stimuli
 
     # Which response buttons to use
@@ -136,44 +148,26 @@ class sart():
     # Define the trial loop
     def runTrials(self, trialObj):
         from psychopy import event
-        import mindwandering
-        self.mw = mindwandering.mwDual(self.win)
         self.trialhandler = trialObj
         self.countTrials = 0
-        self.timer = core.Clock()
-        stim = self.createStim()
+        print(self.frameR)
 
         # Timing based on frames and frame rate
         self.targetFrames = int(self.frameR * self.numTime)
         self.itiFrames = int(self.frameR * self.maskTime)
 
-        # Log file
-        self.log.createFile(self.trialhandler[0])
-
         for trial in self.trialhandler:
-            if trial['Stimulus'] == '0':
-                mwResp = self.mw.rating()
-                trial['Type'] = mwResp['Type']
-                if mwResp['Type'] == 'MWdual':
-                    trial['dualWhereResp'] = mwResp['Response where']
-                    trial['dualAwareResp'] = mwResp['Response aware']
-                    trial['dualWhereRT'] = mwResp['RT where']
-                    trial['dualAwareRT'] = mwResp['RT aware']
-                elif mwResp['Type'] == 'MWmulti':
-                    trial['multiResp'] = mwResp['Response']
-                    trial['multiRT'] = ['RT']
-                # self.log.append(trial)
-
-            else:
-                stim['number'].setText(trial['Stimulus'])
-                self.timer.reset()
+            trial['GlobalTimeStamp'] = self.globalClock.getTime()
+            self.timer = core.Clock()
+            self.timer.reset()
+            if trial['Stimulus'] != '0':
+                self.stim['number'].setText(trial['Stimulus'])
                 for frame in range(self.targetFrames):
-                    stim['number'].draw()
+                    self.stim['number'].draw()
                     self.win.flip()
-                    trial['GlobalTimeStamp'] = self.globalClock.getTime()
                 for frame in range(self.itiFrames):
                     response = self.responseType()
-                    stim['mask'].draw()
+                    self.stim['mask'].draw()
                     self.win.flip()
 
                     if response:
@@ -191,8 +185,19 @@ class sart():
                             trial['Accuracy'] = '0'
                         elif trial['Type'] == 'NoGo':
                             trial['Accuracy'] = '1'
-
                 self.countTrials += 1  # add 1 to count
+            else:
+                mwResp = self.mw.rating()
+                trial['Type'] = mwResp['Type']
+                if mwResp['Type'] == 'MWdual':
+                    trial['dualWhereResp'] = mwResp['Response where']
+                    trial['dualAwareResp'] = mwResp['Response aware']
+                    trial['dualWhereRT'] = mwResp['RT where']
+                    trial['dualAwareRT'] = mwResp['RT aware']
+                elif mwResp['Type'] == 'MWmulti':
+                    trial['multiResp'] = mwResp['Response']
+                    trial['multiRT'] = ['RT']
+
             trial['trialTimeStamp'] = self.timer.getTime()
             trial['Time'] = time.strftime("%H:%M:%S")
             trial['Trial'] = self.countTrials
@@ -230,15 +235,21 @@ class sart():
 
     # Define experiment
     def startexp(self):
+        import mindwandering
         self.win = self.expWindow()
+        # self.mw = mindwandering.mwDual(self.win)  # dual response
+        self.mw = mindwandering.mwLikert(self.win)  # 7-likert response
         self.instr = self.instructions()
+        self.stim = self.createStim()
         self.frameR = self.win.getActualFrameRate()
         if not self.frameR:
             self.frameR = 60.0
+        # Log file
+        self.log = self.logging()
         self.instr.start('intro1')
         self.trials = self.createTrials()
         trialsToRun = self.experimentTrials(self.trials)
-        self.log = self.logging()
+        self.log.createFile(trialsToRun[0])
         if self.mri_scan:
             self.MRI()  # wait for MRI pulse
             print(self.globalClock.getTime())
