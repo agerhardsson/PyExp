@@ -68,12 +68,10 @@ class GUI():
         self.lab_subj = tk.Label(self.frame, text='Participant:')
         self.subj = tk.Entry(self.frame)
         self.lab_vers = tk.Label(self.frame, text='Version:')
-        self.vers = tk.Listbox(self.frame, height=5)
+        self.vers = tk.Listbox(self.frame, height=3)
         self.vers.insert(1, '1')
         self.vers.insert(2, '2')
-        self.vers.insert(3, '3')
-        self.vers.insert(4, '4')
-        self.vers.insert(5, 'Training')
+        self.vers.insert(3, 'Training')
         self.lab_sess = tk.Label(self.frame, text='Session:')
         self.sess = tk.Entry(self.frame)
         self.var = tk.BooleanVar(value=True)
@@ -149,7 +147,6 @@ class GUI():
 
 
 # Example ------------------------------------
-#
 #
 # gui = GUI(expName='SART')
 # ExpInfo = gui.start()

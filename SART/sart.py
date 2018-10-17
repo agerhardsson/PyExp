@@ -15,6 +15,7 @@ print(expinfo)
 # for testing
 # expinfo = {'subject_id': 'test',
 #            'expName': 'SART'}
+trainingversion = '03'
 
 
 class sart():
@@ -26,10 +27,11 @@ class sart():
                  numTime=.250,
                  maskTime=.900,
                  fullscreen=False):
-
         self.ntrials = nTrials
-        if expinfo['version'] == '05':
+        self.training = False
+        if expinfo['version'] == trainingversion:
             self.ntrials = 47
+            self.training = True
         self.numTime = numTime
         self.maskTime = maskTime
         self.FullScreen = fullscreen
@@ -63,11 +65,7 @@ class sart():
             f = open('lists/list_1.txt', 'r')
         elif expinfo['version'] == '02':
             f = open('lists/list_2.txt', 'r')
-        elif expinfo['version'] == '03':
-            f = open('lists/list_3.txt', 'r')
-        elif expinfo['version'] == '04':
-            f = open('lists/list_4.txt', 'r')
-        elif expinfo['version'] == '05':
+        elif expinfo['version'] == trainingversion:
             f = open('lists/list_training.txt', 'r')
 
         trials = f.read().split('\n')
@@ -127,10 +125,20 @@ class sart():
         stimuli['mask'] = visual.SimpleImageStim(
             self.win,
             image='stim/MaskCircle125.png')
-        # stimuli['mask'] = visual.ImageStim(
-        #     self.win,
-        #     image='stim/MaskCircle125.png'
-        # )
+
+        stimuli['fb_correct'] = visual.TextStim(
+            self.win,
+            text='+',
+            color='Green',
+            height=0.2,
+            pos=[0.0, -0.2])
+
+        stimuli['fb_incorrect'] = visual.TextStim(
+            self.win,
+            text='x',
+            color='Red',
+            height=0.2,
+            pos=[0.0, -0.2])
 
         return stimuli
 
@@ -165,11 +173,14 @@ class sart():
                 for frame in range(self.targetFrames):
                     self.stim['number'].draw()
                     self.win.flip()
-                for frame in range(self.itiFrames):
                     response = self.responseType()
+                    if response:
+                        trial['Response'] = '1'
+                        trial['RT'] = self.timer.getTime()
+                for frame in range(self.itiFrames):
                     self.stim['mask'].draw()
                     self.win.flip()
-
+                    response = self.responseType()
                     if response:
                         trial['Response'] = '1'
                         trial['RT'] = self.timer.getTime()
@@ -177,19 +188,28 @@ class sart():
                     if trial['Response'] == '1':
                         if trial['Type'] == 'Go':
                             trial['Accuracy'] = '1'
+
                         elif trial['Type'] == 'NoGo':
                             trial['Accuracy'] = '0'
 
                     elif trial['Response'] == '0':
                         if trial['Type'] == 'Go':
                             trial['Accuracy'] = '0'
+
                         elif trial['Type'] == 'NoGo':
                             trial['Accuracy'] = '1'
+
+                # feedback during training if incorrect
+                if self.training and trial['Accuracy'] == '0':
+                    for frame in range(self.targetFrames):
+                        self.stim['fb_incorrect'].draw()
+                        self.win.flip()
+
                 self.countTrials += 1  # add 1 to count
             else:
                 mwResp = self.mw.rating()
                 trial['Type'] = mwResp['Type']
-                if mwResp['Type'] == 'MWdual':
+                if mwResp['Type'] == 'MWdual' or mwResp['Type'] == 'MWLikert':
                     trial['dualWhereResp'] = mwResp['Response where']
                     trial['dualAwareResp'] = mwResp['Response aware']
                     trial['dualWhereRT'] = mwResp['RT where']
@@ -247,6 +267,7 @@ class sart():
         # Log file
         self.log = self.logging()
         self.instr.start('intro1')
+        self.instr.start('intro2')
         self.trials = self.createTrials()
         trialsToRun = self.experimentTrials(self.trials)
         self.log.createFile(trialsToRun[0])

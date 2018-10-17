@@ -4,6 +4,7 @@
 from __future__ import division
 from psychopy import event, visual, core
 
+# Question and options for multi-response
 quest1 = (u'Välj det alternativ nedan som bäst beskriver din\n'
           u' upplevelse just nu (precis innan denna fråga).')
 
@@ -14,6 +15,17 @@ alt4 = (u'4. Jag märkte att jag började tänka på annat medan '
         u'jag gjorde uppgiften.')
 alt5 = (u'5. Jag tänkte på andra saker under uppgiften\n'
         u'     men jag var inte medveten om det förrän jag blev frågad.')
+
+# Question and options for dual and likert response
+quest2 = (u'Var fanns din uppmärksamhet precis innan denna fråga?')
+resp2_1 = (u'På uppgiften')
+resp2_2 = (u'Inte på uppgiften')
+
+quest3 = (u'Hur medveten var du om var din uppmärksamhet fanns?')
+resp3_1 = (u'Medveten')
+resp3_2 = (u'Omedveten')
+
+tLimit = 60
 
 
 class mwMulti():
@@ -218,6 +230,11 @@ class mwMulti():
                 core.wait(1)
                 break
 
+            elif self.timer.getTime() > tLimit:
+                response['Response'] = ''
+                response['RT'] = self.timer.getTime()
+                break
+
             if event.getKeys(keyList=["escape"]):
                 core.quit()
         core.wait(0.5)
@@ -279,7 +296,7 @@ class mwDual():
 
         self.text = visual.TextStim(
             win=self.win,
-            text=u'Var fanns din uppmärksamhet precis innan denna fråga?',
+            text=quest2,
             alignHoriz='center',
             pos=self.pos['quest'],
             height=self.txsize,
@@ -289,7 +306,7 @@ class mwDual():
 
         self.text = visual.TextStim(
             win=self.win,
-            text=u'På uppgiften',
+            text=resp2_1,
             alignHoriz='center',
             pos=self.pos['keyLeft'],
             height=self.txsize,
@@ -299,7 +316,7 @@ class mwDual():
 
         self.text = visual.TextStim(
             win=self.win,
-            text=u'Inte på uppgiften',
+            text=resp2_2,
             alignHoriz='center',
             pos=self.pos['keyRight'],
             height=self.txsize,
@@ -309,7 +326,7 @@ class mwDual():
 
         self.text = visual.TextStim(
             win=self.win,
-            text=u'Hur medveten var du om var din uppmärksamhet fanns?',
+            text=quest3,
             alignHoriz='center',
             pos=self.pos['quest'],
             height=self.txsize,
@@ -319,7 +336,7 @@ class mwDual():
 
         self.text = visual.TextStim(
             win=self.win,
-            text=u'Medveten',
+            text=resp3_1,
             alignHoriz='center',
             pos=self.pos['keyLeft'],
             height=self.txsize,
@@ -329,7 +346,7 @@ class mwDual():
 
         self.text = visual.TextStim(
             win=self.win,
-            text=u'Inte medveten',
+            text=resp3_2,
             alignHoriz='center',
             pos=self.pos['keyRight'],
             height=self.txsize,
@@ -405,6 +422,11 @@ class mwDual():
                 core.wait(0.5)
                 break
 
+            elif self.timer.getTime() > tLimit:
+                response['Response where'] = ''
+                response['RT where'] = self.timer.getTime()
+                break
+
             if event.getKeys(keyList=["escape"]):
                 core.quit()
         core.wait(0.5)
@@ -418,7 +440,6 @@ class mwDual():
 
         while True:
             self.theseKeys = event.getKeys(keyList=['4', '3', 'l', 'a'])
-
             for a in range(0, 3):
                 self.scale['Attention aware'][a].setAutoDraw(True)
             self.win.flip()
@@ -429,6 +450,11 @@ class mwDual():
                 self.stimuli['spot'].draw()
                 self.win.flip()
                 core.wait(0.5)
+                break
+
+            elif self.timer.getTime() > tLimit:
+                response['Response aware'] = ''
+                response['RT aware'] = self.timer.getTime()
                 break
 
             if event.getKeys(keyList=["escape"]):
@@ -494,7 +520,7 @@ class mwLikert():
 
         self.text = visual.TextStim(
             win=self.win,
-            text=u'Var fanns din uppmärksamhet precis innan denna fråga?',
+            text=quest2,
             alignHoriz='center',
             pos=self.pos['quest'],
             height=self.txsize,
@@ -504,7 +530,7 @@ class mwLikert():
 
         self.text = visual.TextStim(
             win=self.win,
-            text=u'På uppgiften',
+            text=resp2_1,
             alignHoriz='center',
             pos=self.pos['keyLeft'],
             height=self.txsize,
@@ -514,7 +540,7 @@ class mwLikert():
 
         self.text = visual.TextStim(
             win=self.win,
-            text=u'Inte på uppgiften',
+            text=resp2_2,
             alignHoriz='center',
             pos=self.pos['keyRight'],
             height=self.txsize,
@@ -524,7 +550,7 @@ class mwLikert():
 
         self.text = visual.TextStim(
             win=self.win,
-            text=u'Hur medveten var du om var din uppmärksamhet fanns?',
+            text=quest3,
             alignHoriz='center',
             pos=self.pos['quest'],
             height=self.txsize,
@@ -534,7 +560,7 @@ class mwLikert():
 
         self.text = visual.TextStim(
             win=self.win,
-            text=u'Medveten',
+            text=resp3_1,
             alignHoriz='center',
             pos=self.pos['keyLeft'],
             height=self.txsize,
@@ -544,7 +570,7 @@ class mwLikert():
 
         self.text = visual.TextStim(
             win=self.win,
-            text=u'Inte medveten',
+            text=resp3_2,
             alignHoriz='center',
             pos=self.pos['keyRight'],
             height=self.txsize,
@@ -633,36 +659,52 @@ class mwLikert():
         response = {}
         response['Type'] = 'MWLikert'
         self.timer.reset()
-        while self.scale['likert'].noResponse:
+        while True:
             for a in range(0, 3):
                 self.scale['Attention where'][a].draw()
             self.stimuli['arrowL'].draw()
             self.stimuli['arrowR'].draw()
             self.win.flip()
             self.scale['likert'].draw()
+            if not self.scale['likert'].noResponse:
+                response['Response where'] = self.scale['likert'].getRating()
+                response['RT where'] = self.scale['likert'].getRT()
+                break
+
+            elif self.timer.getTime() > tLimit:
+                response['Response where'] = ''
+                response['RT where'] = self.timer.getTime()
+                break
 
             if event.getKeys(keyList=["escape"]):
                 core.quit()
-        response['Response where'] = self.scale['likert'].getRating()
-        response['RT where'] = self.scale['likert'].getRT()
+
         core.wait(0.2)
         self.win.flip()
         core.wait(0.2)
 
         self.scale['likert'].reset()
         self.timer.reset()
-        while self.scale['likert'].noResponse:
+        while True:
             for a in range(0, 3):
                 self.scale['Attention aware'][a].draw()
             self.stimuli['arrowL'].draw()
             self.stimuli['arrowR'].draw()
             self.win.flip()
             self.scale['likert'].draw()
+            if not self.scale['likert'].noResponse:
+                response['Response aware'] = self.scale['likert'].getRating()
+                response['RT aware'] = self.scale['likert'].getRT()
+                break
+
+            elif self.timer.getTime() > tLimit:
+                response['Response aware'] = ''
+                response['RT aware'] = self.timer.getTime()
+                break
 
             if event.getKeys(keyList=["escape"]):
                 core.quit()
-        response['Response aware'] = self.scale['likert'].getRating()
-        response['RT aware'] = self.scale['likert'].getRT()
+
         core.wait(0.2)
         self.win.flip()
         core.wait(0.2)
@@ -675,7 +717,7 @@ class mwLikert():
 
 # Example --------------------------------------------------------------------
 # win = visual.Window(
-#     fullscr=True,
+#     fullscr=False,
 #     monitor=u'testMonitor',
 #     allowGUI=None,
 #     checkTiming=True,

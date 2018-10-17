@@ -1,7 +1,7 @@
 rm(list=ls())
 
 n_trials <- 550
-n_mw <- 10
+n_mw <- 16 # ≈ 3%
 n_tot <- n_trials + n_mw
 # prob_go <- 0.95/8
 n_nogo <- 28 # ≈ 5 %
@@ -20,15 +20,15 @@ mw <- 0
       while (length(list) < n_tot + 1) {
       # Generat a list of n items 1-9, without 3 and 0
         x <- sample(go_list, 8)
-        block <- n_tot/10
+        block <- round(n_tot/n_mw)
         
         # Generate random positions for 0s and 3s
         # first MW not before trial 15, and first 3 not before trial 3
-        (start_mw <- sample(12:20, 1))
+        # (start_mw <- sample(12:20, 1))
         (start_nogo <- sample(3:5, 1))
         
-        # nogo size, proper 2.8 times per 55 block it is weighted in favor to 3
-        nogo_size <- sample(c(2,3), 1, prob = c(0.4, 0.6))
+        # nogo size, wheighted
+        nogo_size <- sample(c(1,2), 1, prob = c(1/4, 3/4))
         
         while (length(x)<block+1) {
           x <- c(x, sample(go_list, 8))
@@ -37,7 +37,7 @@ mw <- 0
         
         # genereate position list
 
-          (mw_pos <- sort(sample(x = seq(start_mw, block), size = 1)))
+          (mw_pos <- sort(sample(x = seq(12, block), size = 1)))
           (nogo_pos <- sort(sample(x = seq(start_nogo, block), size = nogo_size)))
           
 
@@ -54,7 +54,7 @@ mw <- 0
       to_close <- NULL
       check <- NULL
       for (p in nogo_new_pos){
-        for (r in seq(-3,3)) {
+        for (r in seq(-5,2)) {
           check <-  c(check, mw_new_pos + r)
           
           to_close <- c(to_close, any(p %in% check))
@@ -92,3 +92,6 @@ write.table(list_10, 'list_10.txt', row.names = FALSE, col.names = FALSE)
 write.csv2(cbind(list_1, list_2, list_3, list_4, list_5, 
                  list_6, list_7, list_8, list_9, list_10), 
            file = "check_list.csv")
+
+# write.csv2(cbind(list_1, list_2), 
+#            file = "check_list2.csv")
