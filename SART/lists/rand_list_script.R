@@ -10,9 +10,10 @@ prob_mw <- n_mw/(n_trials + n_mw)
 go_list <- c(1, 2, 4, 5, 6, 7, 8, 9)
 nogo <- 3
 mw <- 0
+lists <- 10
 
 # Sample loop (It takes a while to run...)
-  for (i in seq(1,10)) {
+  for (i in seq(1,lists)) {
   list_name <- paste('list', i, sep = "_")
   success <- FALSE
     while (!success) {
@@ -72,6 +73,7 @@ mw <- 0
           & to_close == FALSE) 
         success <- TRUE
     }
+    print(paste0(i,"/", lists, ' lists finished!'))
     assign(list_name, list)
   }
 
