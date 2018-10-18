@@ -11,9 +11,9 @@ Work bench
 images/
 *.jpg
 *.bmp
-*.png
 
 # ignore other files
+*.afdesign
 *.pyc
 *.pxm
 
