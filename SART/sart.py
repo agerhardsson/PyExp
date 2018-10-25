@@ -67,8 +67,7 @@ class sart():
         elif expinfo['version'] == u'tr':
             f = open('lists/list_training.txt', 'r')
 
-        # expinfo['list'] = f.name[6:]
-        expinfo['list'] = u"test"
+        expinfo['list'] = f.name[6:]
         trials = f.read().split('\n')
         return trials[0:self.ntrials]
 
