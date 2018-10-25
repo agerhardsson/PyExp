@@ -28,7 +28,7 @@ class sart():
                  fullscreen=False):
         self.ntrials = nTrials
         self.training = False
-        if expinfo['version'] == 'tr':
+        if expinfo['version'] == u'tr':
             self.ntrials = 47
             self.training = True
         self.numTime = numTime
@@ -53,7 +53,7 @@ class sart():
             }
         launchScan(
             self.win, MR_settings,
-            mode='Scan',  # also takes 'Test'
+            mode=u'Scan',  # also takes 'Test'
             globalClock=self.globalClock,
             log=False)
 
@@ -64,10 +64,11 @@ class sart():
             f = open('lists/list_5.txt', 'r')
         elif expinfo['version'] == '02':
             f = open('lists/list_6.txt', 'r')
-        elif expinfo['version'] == 'tr':
+        elif expinfo['version'] == u'tr':
             f = open('lists/list_training.txt', 'r')
 
-        expinfo['list'] = f.name[6:]
+        # expinfo['list'] = f.name[6:]
+        expinfo['list'] = u"test"
         trials = f.read().split('\n')
         return trials[0:self.ntrials]
 
@@ -348,13 +349,17 @@ class sart():
 
         # Create trials
         self.trials = self.createTrials()
+        print('trials created -----------------------------------')
         trialsToRun = self.experimentTrials(self.trials)
+        print('trials set -----------------------------------')
         self.log.createFile(trialsToRun[0])
+        print('log is set -----------------------------------')
 
         # If MRI, wait for sync pulse
         if self.mri_scan:
             self.MRI()  # wait for MRI pulse
-            print(self.globalClock.getTime())
+            # print(self.globalClock.getTime())
+            print('MRI launched -----------------------------------')
         else:
             self.globalClock.reset()
 
