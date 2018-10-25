@@ -36,8 +36,11 @@ class GUI():
 
     def start_exp(self):
         self.version = format(int(self.vers.curselection()[0] + 1), '02d')
+        if self.version == '03':
+            self.version = 'tr'
         self.session = format(int(self.sess.get()), '02d')
         self.participant = str(format(int(self.subj.get()), '04d') + "_" +
+                               self.version + "_" +
                                self.session)
         self.mri = self.var.get()
         if self.check_participants():

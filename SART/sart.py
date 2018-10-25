@@ -15,7 +15,6 @@ print(expinfo)
 # for testing
 # expinfo = {'subject_id': 'test',
 #            'expName': 'SART'}
-trainingversion = '03'
 
 
 class sart():
@@ -29,7 +28,7 @@ class sart():
                  fullscreen=False):
         self.ntrials = nTrials
         self.training = False
-        if expinfo['version'] == trainingversion:
+        if expinfo['version'] == 'tr':
             self.ntrials = 47
             self.training = True
         self.numTime = numTime
@@ -62,12 +61,13 @@ class sart():
     def createTrials(self):
         # import trial lists
         if expinfo['version'] == '01':
-            f = open('lists/list_1.txt', 'r')
+            f = open('lists/list_5.txt', 'r')
         elif expinfo['version'] == '02':
-            f = open('lists/list_2.txt', 'r')
-        elif expinfo['version'] == trainingversion:
+            f = open('lists/list_6.txt', 'r')
+        elif expinfo['version'] == 'tr':
             f = open('lists/list_training.txt', 'r')
 
+        expinfo['list'] = f.name[6:]
         trials = f.read().split('\n')
         return trials[0:self.ntrials]
 
@@ -92,6 +92,7 @@ class sart():
             dataList['Session'] = expinfo['session']
             dataList['Task'] = expinfo['expName']
             dataList['Version'] = expinfo['version']
+            dataList['list'] = expinfo['list']
             dataList['Date'] = time.strftime("%Y%m%d")
             dataList['Time'] = time.strftime("%H:%M:%S")
             dataList['GlobalTimeStamp'] = 0
@@ -149,8 +150,8 @@ class sart():
             # According to Karolinska scanner
             resp = event.getKeys(keyList=['4', '3'])
         else:
-            # If running on regular keyboard
-            resp = event.getKeys(keyList=['a', 'l', 'space'])
+            # If running outside the scanner (include keyboard responses)
+            resp = event.getKeys(keyList=['4', '3', 'a', 'l', 'space'])
         return resp
 
     # Define the trial loop
@@ -199,13 +200,83 @@ class sart():
                         elif trial['Type'] == 'NoGo':
                             trial['Accuracy'] = '1'
 
+                self.countTrials += 1  # add 1 to count
+            else:
+                mwResp = self.mw.rating()
+                trial['Type'] = mwResp['Type']
+                if mwResp['Type'] == 'MWdual' or mwResp['Type'] == 'MWLikert':
+                    trial['dualWhereResp'] = mwResp['Response where']
+                    trial['dualAwareResp'] = mwResp['Response aware']
+                    trial['dualWhereRT'] = mwResp['RT where']
+                    trial['dualAwareRT'] = mwResp['RT aware']
+                elif mwResp['Type'] == 'MWmulti':
+                    trial['multiResp'] = mwResp['Response']
+                    trial['multiRT'] = ['RT']
+
+            trial['trialTimeStamp'] = self.timer.getTime()
+            trial['Time'] = time.strftime("%H:%M:%S")
+            trial['Trial'] = self.countTrials
+            self.log.append(trial)
+
+            if event.getKeys(keyList=["escape"]):
+                core.quit()
+
+    # Define the training loop
+    def runTraining(self, trialObj):
+        from psychopy import event
+        self.trialhandler = trialObj
+        self.countTrials = 0
+        print(self.frameR)
+
+        # Timing based on frames and frame rate
+        self.targetFrames = int(self.frameR * self.numTime)
+        self.itiFrames = int(self.frameR * self.maskTime)
+
+        for trial in self.trialhandler:
+            trial['GlobalTimeStamp'] = self.globalClock.getTime()
+            self.timer = core.Clock()
+            self.timer.reset()
+            if trial['Stimulus'] != '0':
+                self.stim['number'].setText(trial['Stimulus'])
+                for frame in range(self.targetFrames):
+                    self.stim['number'].draw()
+                    self.win.flip()
+                    response = self.responseType()
+                    if response:
+                        trial['Response'] = '1'
+                        trial['RT'] = self.timer.getTime()
+                for frame in range(self.itiFrames):
+                    self.stim['mask'].draw()
+                    self.win.flip()
+                    response = self.responseType()
+                    if response:
+                        trial['Response'] = '1'
+                        trial['RT'] = self.timer.getTime()
+
+                    if trial['Response'] == '1':
+                        if trial['Type'] == 'Go':
+                            trial['Accuracy'] = '1'
+
+                        elif trial['Type'] == 'NoGo':
+                            trial['Accuracy'] = '0'
+
+                    elif trial['Response'] == '0':
+                        if trial['Type'] == 'Go':
+                            trial['Accuracy'] = '0'
+
+                        elif trial['Type'] == 'NoGo':
+                            trial['Accuracy'] = '1'
+
                 # feedback during training if incorrect
-                if self.training and trial['Accuracy'] == '0':
+                if trial['Accuracy'] == '0' and self.countTrials < 26:
                     for frame in range(self.targetFrames):
                         self.stim['fb_incorrect'].draw()
                         self.win.flip()
 
                 self.countTrials += 1  # add 1 to count
+
+                if self.countTrials == 26:
+                    self.instr.start('training2')
             else:
                 mwResp = self.mw.rating()
                 trial['Type'] = mwResp['Type']
@@ -257,6 +328,7 @@ class sart():
     def startexp(self):
         import mindwandering
         self.win = self.expWindow()
+
         # self.mw = mindwandering.mwDual(self.win)  # dual response
         self.mw = mindwandering.mwLikert(self.win)  # 7-likert response
         self.instr = self.instructions()
@@ -264,19 +336,35 @@ class sart():
         self.frameR = self.win.getActualFrameRate()
         if not self.frameR:
             self.frameR = 60.0
+
         # Log file
         self.log = self.logging()
-        self.instr.start('intro1')
-        self.instr.start('intro2')
+
+        # Instructions
+        self.instr.start('sartintro')
+        self.instr.start('probeintro')
+        if self.training:
+            self.instr.start('training')
+
+        # Create trials
         self.trials = self.createTrials()
         trialsToRun = self.experimentTrials(self.trials)
         self.log.createFile(trialsToRun[0])
+
+        # If MRI, wait for sync pulse
         if self.mri_scan:
             self.MRI()  # wait for MRI pulse
             print(self.globalClock.getTime())
         else:
             self.globalClock.reset()
-        self.runTrials(trialsToRun)
+
+        # Run trials
+        if not self.training:
+            self.runTrials(trialsToRun)
+        elif self.training:
+            self.runTraining(trialsToRun)
+
+        # End instruction
         self.instr.start('end')
 
 

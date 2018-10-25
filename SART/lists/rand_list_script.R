@@ -5,7 +5,7 @@ n_mw <- 16 # ≈ 3%
 n_tot <- n_trials + n_mw
 # prob_go <- 0.95/8
 n_nogo <- 28 # ≈ 5 %
-prob_mw <- n_mw/(n_trials + n_mw)
+prob_mw <- n_mw/n_tot
 
 go_list <- c(1, 2, 4, 5, 6, 7, 8, 9)
 nogo <- 3
@@ -77,7 +77,41 @@ lists <- 10
     assign(list_name, list)
   }
 
+list_df <- data.frame(cbind(list_1, list_2, list_3, list_4, list_5, 
+      list_6, list_7, list_8, list_9, list_10))
+probe_df <- data.frame(which(list_df==0, arr.ind = TRUE))
+nogo_df <- data.frame(which(list_df==3, arr.ind = TRUE))
+
+probe_sd <- round(tapply(probe_df$row, probe_df$col, sd), 2)
+nogo_sd <- round(tapply(nogo_df$row, nogo_df$col, sd), 2)
+
+pdf(file = "NoGo and Probe positions.pdf", height = 8, width = 11, paper = "a4r")
+plot(nogo_df$row~nogo_df$col,
+     type = 'n',
+     xaxt = 'n',
+     xlab = "Lists", 
+     ylab = "Position"
+     )
+abline(h = seq(0,566, by = 35), col = "grey")
+points(nogo_df$col-0.05, nogo_df$row, col = "grey20", pch = 16)
+points(probe_df$col+0.05, probe_df$row, col = "tomato", pch = 16)
+axis(side = 1, labels = 1:10, at = 1:10) 
+text(x = 0.5, y = 580, 
+     labels = 'SD:', xpd = TRUE, pos = 3, font = 2, offset = 1.2, cex = 0.8)
+text(x = 0.95:9.95, y = 580, 
+     labels = nogo_sd, xpd = TRUE, pos = 3, offset = 1.2, cex = 0.8)
+text(x = 0.5, y = 580, 
+     labels = 'SD:', xpd = TRUE, pos = 3, font = 2, col = "tomato", cex = 0.8)
+text(x = 1.05:10.05, y = 580, 
+     labels = probe_sd, xpd = TRUE, pos = 3, col = "tomato", cex = 0.8)
+mtext(side = 3, "NoGo", line = 2.5, cex = 1.2, font = 4, at = 4)
+mtext(side = 3, "and", line = 2.5, cex = 1.2, font = 2, at = 5)
+mtext(side = 3, "Probe", line = 2.5, cex = 1.2, font = 4, col = "tomato", at = 6)
+mtext(side = 3, "positions", line = 2.5, cex = 1.2, font = 2, at = 7)
+dev.off()
+
 # save.image("lists.RData")
+# load("lists.RData")
 
 # write lists to files
 write.table(list_1, 'list_1.txt', row.names = FALSE, col.names = FALSE)
@@ -91,9 +125,7 @@ write.table(list_8, 'list_8.txt', row.names = FALSE, col.names = FALSE)
 write.table(list_9, 'list_9.txt', row.names = FALSE, col.names = FALSE)
 write.table(list_10, 'list_10.txt', row.names = FALSE, col.names = FALSE)
 
-write.csv2(cbind(list_1, list_2, list_3, list_4, list_5, 
-                 list_6, list_7, list_8, list_9, list_10), 
-           file = "check_list.csv")
+write.csv2(list_df, file = "check_list.csv")
 
 # write.csv2(cbind(list_1, list_2), 
 #            file = "check_list2.csv")

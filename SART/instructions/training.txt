@@ -1,0 +1,11 @@
+
+Du kommer nu att få göra en kortare träningsomgång av uppgiften.
+
+Under denna träningsomgång får du feedback i form av
+ett rött kryss när du svarar fel.
+Dvs. när du trycker på siffran 3, 
+eller inte trycker på någon av de andra siffrorna.
+
+Svara så snabbt och korrekt som möjligt.
+
+(Tryck på med pekfingret (röd) för att starta)

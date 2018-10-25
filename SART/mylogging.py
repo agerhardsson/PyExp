@@ -20,7 +20,9 @@ class log():
         self.file = (self.directory +
                      self.dataKeys['Date'] + "_" +
                      self.dataKeys['subject_id'] + "_" +
-                     self.dataKeys['Session'] + ".txt")
+                     self.dataKeys['Version'] + "_" +
+                     self.dataKeys['Session'] +
+                     ".txt")
         self.f = open(self.file, "w")
         for key in self.dataKeys.keys():
             self.f.write(str(key) + '\t')
