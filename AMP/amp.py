@@ -5,13 +5,14 @@ import collections
 import time
 import numpy as np
 from psychopy import core
-import instructions, gui, mylogging
+import instructions
+import gui
+import mylogging
 
 '''
 Experiment built by Andreas Gerhardsson (2018), based on procedure described in
 MacCormack & Lindquist (2018).
 '''
-
 
 
 class amp():
@@ -26,7 +27,7 @@ class amp():
                  crossTime=0.125,
                  maskTime=0.125,
                  pictoTime=0.100,
-                 pictoType='chinese' #  'japanese' other option
+                 pictoType='chinese'  # 'japanese' other option
                  ):
 
         self.bgCol = bgCol
@@ -72,11 +73,11 @@ class amp():
                                             size=self.imgSize, units='pix')
         noiseTexture = np.random.rand(512, 512) * 2.0 - 1
         stimuli['mask'] = visual.GratingStim(self.win, tex=noiseTexture,
-                                            size=self.imgSize, units='pix',
-                                            interpolate=True)
+                                             size=self.imgSize, units='pix',
+                                             interpolate=True)
         stimuli['pict'] = visual.ImageStim(self.win)
         stimuli['spot'] = visual.TextStim(self.win, text='*', height=0.1,
-                                           color=self.textCol)
+                                          color=self.textCol)
         stimuli['scale'] = visual.RatingScale(
             self.win,
             marker=stimuli['spot'],
@@ -93,6 +94,8 @@ class amp():
             scale=None,
             labels=(u'Extremt behagligt', u'Varken behagligt eller obehagligt',
                     u'Extremt obehagligt'),
+            # labels=(u'Extremt positivt', u'Varken positivt eller negativt',
+            #         u'Extremt negativt'),
             noMouse=True,
             markerStart=4
             )
@@ -123,7 +126,6 @@ class amp():
                 Desc.append(x.split('\t')[3])
                 PictJ.append(x.split('\t')[4])
                 PictC.append(x.split('\t')[5])
-
 
         imgDict = collections.OrderedDict()
         imgDict[IAPS_number[0]] = IAPS_number[1:len(IAPS_number)]
@@ -197,7 +199,7 @@ class amp():
         self.pictoFrames = int(self.frameR * self.pictoTime)
         trial = 0
 
-        for t in range(0,self.nTrials):
+        for t in range(0, self.nTrials):
             self.stim['image'].setImage('Payen2005IAPS/' +
                                         trialObj['IAPSjpg'][t])
             self.stim['pict'].setImage('Pictogram/' +
@@ -235,7 +237,6 @@ class amp():
             if event.getKeys(keyList=['escape']):
                 core.quit()
 
-
     def startexp(self):
         self.win = self.expWindow()
         instructions = self.instructions()
@@ -258,6 +259,7 @@ class amp():
         instructions.start('end')
         core.quit()
 
+
 def kss():
     import kss
     win = amp().expWindow()
@@ -265,7 +267,8 @@ def kss():
     kssResp = kss.rating()
     kss.log(subjId=expinfo['subject_id'], dataDict=kssResp)
 
-# Example ----------------------------------------------------
+
+# Run experiment ----------------------------------------------------
 gui = gui.GUI(expName='AMP')
 expinfo = gui.start()
 
