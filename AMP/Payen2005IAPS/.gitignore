@@ -1,0 +1,6 @@
+
+# Ignore Mac and cache files
+.DS_Store
+
+# ignore data folder
+*.jpg

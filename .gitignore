@@ -3,8 +3,14 @@
 .DS_Store
 __pycache__
 
-# ignore data files
-data/
+# ignore data folder
+# data/
+
+
+# ignore data files but keep folder (not working?!)
+data/*
+!data/.keep
+
 Work bench
 
 # ignore image files

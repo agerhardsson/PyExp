@@ -1,0 +1,18 @@
+
+I det här testet är din uppgift att bedömma ett antal Kinesiska tecken
+på en skala från "Extremt behagligt" till "Extremt obehagligt".
+
+Innan varje tecken visas en emotionell bild. Försök att ignorera bilden
+och fokusera bedömningen på det Kinesiska tecknet.
+
+Det går väldigt snabbt så var uppmärksam.
+
+Svara genom att flytta markören till:
+
+Vänster: A
+Höger: L
+Bekräfta ditt svar: Mellanslag
+
+Du har 10 sekunder på dig att svara.
+
+Tryck Mellanslag för att starta
