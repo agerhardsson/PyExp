@@ -10,11 +10,15 @@ from psychopy import visual, event, core
 
 class kss():
 
-    def __init__(self, win, textCol='black', textSize=.1):
+    def __init__(self, win, textCol='black', textSize=.08):
 
         self.win = win
         self.textcol = textCol
         self.txsize = textSize
+        self.keyList = ['1', '2', '3', '4', '5', '6', '7', '8', '9',
+                        'num_1', 'num_2', 'num_3', 'num_4', 'num_5',
+                        'num_6', 'num_7', 'num_8', 'num_9']
+        self.arrowList = ['up', 'down', 'space']
 
         # generate position parameters and save in dictionary
         self.pos = {}
@@ -32,25 +36,29 @@ class kss():
         self.pos['kss7'] = [self.pos['right'], self.pos['top']-.6]
         self.pos['kss8'] = [self.pos['right'], self.pos['top']-.7]
         self.pos['kss9'] = [self.pos['right'], self.pos['top']-.84]
-
-    # Create custom mouse and marker ------------------------------------------
-    def createMouse(self):
-        marker = {}
-        marker['mouse'] = visual.CustomMouse(
-            win=self.win,
-            leftLimit=self.pos['left'],
-            topLimit=self.pos['top'],
-            rightLimit=self.pos['right'],
-            bottomLimit=self.pos['bottom'],
-            pointer=None,
-            visible=False)
+        self.pos['key1'] = [self.pos['right']-0.05, self.pos['top']]
+        self.pos['key2'] = [self.pos['right']-0.05, self.pos['top']-.1]
+        self.pos['key3'] = [self.pos['right']-0.05, self.pos['top']-.2]
+        self.pos['key4'] = [self.pos['right']-0.05, self.pos['top']-.3]
+        self.pos['key5'] = [self.pos['right']-0.05, self.pos['top']-.4]
+        self.pos['key6'] = [self.pos['right']-0.05, self.pos['top']-.5]
+        self.pos['key7'] = [self.pos['right']-0.05, self.pos['top']-.6]
+        self.pos['key8'] = [self.pos['right']-0.05, self.pos['top']-.7]
+        self.pos['key9'] = [self.pos['right']-0.05, self.pos['top']-.8]
 
     # Create marker for selection
-        marker['spot'] = visual.Circle(
-            win=self.win,
-            radius=0.04,
-            lineColor=self.textcol,
-            lineWidth=3)
+    def createMarker(self):
+        marker = {}
+        # marker['spot'] = visual.Circle(win=self.win,
+        #                                radius=0.04,
+        #                                lineColor=self.textcol,
+        #                                lineWidth=3)
+
+        marker['spot'] = visual.TextStim(win=self.win,
+                                         text='>',
+                                         height=self.txsize,
+                                         color=self.textcol)
+
         return marker
 
     # create the kss scale ----------------------------------------------------
@@ -86,7 +94,7 @@ class kss():
                 text=kssDict['kssText'][val],
                 alignHoriz='left',
                 pos=kssDict['altPos'][val],
-                height=0.07,
+                height=self.txsize,
                 wrapWidth=1.8,
                 color=self.textcol)
             kssStimList.append(kssStim)
@@ -99,67 +107,48 @@ class kss():
 
         if '1' in self.theseKeys or 'num_1' in self.theseKeys:
             keyResp = '1'
-            self.marker['spot'].setPos(self.pos['kss1'])
+            self.marker['spot'].setPos(self.pos['key1'])
         elif '2' in self.theseKeys or 'num_2' in self.theseKeys:
             keyResp = '2'
-            self.marker['spot'].setPos(self.pos['kss2'])
+            self.marker['spot'].setPos(self.pos['key2'])
         elif '3' in self.theseKeys or 'num_3' in self.theseKeys:
             keyResp = '3'
-            self.marker['spot'].setPos(self.pos['kss3'])
+            self.marker['spot'].setPos(self.pos['key3'])
         elif '4' in self.theseKeys or 'num_4' in self.theseKeys:
             keyResp = '4'
-            self.marker['spot'].setPos(self.pos['kss4'])
+            self.marker['spot'].setPos(self.pos['key4'])
         elif '5' in self.theseKeys or 'num_5' in self.theseKeys:
             keyResp = '5'
-            self.marker['spot'].setPos(self.pos['kss5'])
+            self.marker['spot'].setPos(self.pos['key5'])
         elif '6' in self.theseKeys or 'num_6' in self.theseKeys:
             keyResp = '6'
-            self.marker['spot'].setPos(self.pos['kss6'])
+            self.marker['spot'].setPos(self.pos['key6'])
         elif '7' in self.theseKeys or 'num_7' in self.theseKeys:
             keyResp = '7'
-            self.marker['spot'].setPos(self.pos['kss7'])
+            self.marker['spot'].setPos(self.pos['key7'])
         elif '8' in self.theseKeys or 'num_8' in self.theseKeys:
             keyResp = '8'
-            self.marker['spot'].setPos(self.pos['kss8'])
+            self.marker['spot'].setPos(self.pos['key8'])
         elif '9' in self.theseKeys or 'num_9' in self.theseKeys:
             keyResp = '9'
-            self.marker['spot'].setPos(self.pos['kss9'])
+            self.marker['spot'].setPos(self.pos['key9'])
         return keyResp
 
     # Run the rating scale ----------------------------------------------------
     def rating(self):
         self.timer = core.Clock()
-        self.marker = self.createMouse()
+        self.marker = self.createMarker()
         event.clearEvents(eventType='keyboard')
         self.timer.reset()
         kssResp = {}
         self.scale(True)
 
         while True:
-            mouse1, mouse2, mouse3 = self.marker['mouse'].getPressed()
-            self.theseKeys = event.getKeys(
-                keyList=['1', '2', '3', '4', '5', '6', '7', '8', '9',
-                         'num_1', 'num_2', 'num_3', 'num_4', 'num_5',
-                         'num_6', 'num_7', 'num_8', 'num_9'])
-            self.marker['spot'].setPos((
-                self.marker['mouse'].getPos()[0]+0.01,
-                round(self.marker['mouse'].getPos()[1], 1)))
-
-            self.marker['spot'].draw()
-            self.marker['mouse'].draw()
+            self.theseKeys = event.getKeys(keyList=self.keyList)
             self.win.flip()
-
-            if mouse1:
-                kssResp['kssAnswer'] = str(abs(round(
-                    self.marker['mouse'].getPos()[1], 1)*10-5))
-
-                kssResp['kssRT'] = self.timer.getTime()
-                break
-
-            elif self.theseKeys:
+            if self.theseKeys:
                 kssResp['kssAnswer'] = self.key_answer()
                 kssResp['kssRT'] = self.timer.getTime()
-
                 self.marker['spot'].draw()
                 self.win.flip()
                 break
@@ -214,7 +203,7 @@ class kss():
 
 
 # --------------------- Example -----------------------------------------------
-# create window
+# # create window
 # win = visual.Window(
 #     fullscr=False,
 #     monitor='testMonitor',

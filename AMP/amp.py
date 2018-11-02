@@ -11,7 +11,35 @@ import mylogging
 
 '''
 Experiment built by Andreas Gerhardsson (2018), based on procedure described in
-MacCormack & Lindquist (2018).
+Hashimoto (2005), and an alternative described in MacCormack & Lindquist (2018)
+
+Use the following time settings:
+
+Payen (2005):
+imageTime=0.075,
+crossTime=1.000,
+maskTime=None,
+blankTime=0.125,
+pictoTime=0.100,
+responseStyle='payen2005'
+
+
+Hashimoto (2012):
+imageTime=0.075,
+crossTime=1.000,
+maskTime=2.000,
+blankTime=0.425,
+pictoTime=0.100,
+responseStyle='dual'
+
+MacCormack & Lindquist (2018)
+imageTime=0.075,
+crossTime=0.125,
+maskTime=0.125,
+blankTime=0.425,  # not used in this test
+pictoTime=0.100,
+responseStyle='likert'
+
 '''
 
 
@@ -22,28 +50,33 @@ class amp():
                  fullscreen=True,
                  winSize=(1280, 800),
                  imgSize=(1024, 768),
-                 nTrials=48,
+                 nTrials=3,
                  imageTime=0.075,
-                 crossTime=0.125,
-                 maskTime=0.125,
+                 crossTime=1.000,
+                 maskTime=2.000,
+                 blankTime=0.425,
                  pictoTime=0.100,
+                 responseStyle='dual',  # 'likert', 'payen2005' other option
                  pictoType='chinese'  # 'japanese' other option
+
                  ):
 
         self.bgCol = bgCol
-        if self.bgCol == 'black':
-            self.textCol = "white"
-        else:
+        if self.bgCol == 'white':
             self.textCol = "black"
+        else:
+            self.textCol = "white"
         self.pictoType = pictoType
         self.Fullscreen = fullscreen
         self.winSize = winSize
         self.imgSize = imgSize
         self.nTrials = nTrials
+        self.blankTime = blankTime
         self.imageTime = imageTime
         self.crossTime = crossTime
         self.maskTime = maskTime
         self.pictoTime = pictoTime
+        self.responseStyle = responseStyle
         self.timer = core.Clock()
 
     # Create the window
@@ -100,6 +133,22 @@ class amp():
             markerStart=4
             )
 
+        stimuli['behagligt'] = visual.TextStim(self.win,
+                                               text='Behagligt',
+                                               pos=[-.5, -.7],
+                                               color=self.textCol)
+        stimuli['obehagligt'] = visual.TextStim(self.win,
+                                                text='Obehagligt',
+                                                pos=[.5, -.7],
+                                                color=self.textCol)
+        stimuli['positiv'] = visual.TextStim(self.win,
+                                             text='Positivt',
+                                             pos=[-.5, -.7],
+                                             color=self.textCol)
+        stimuli['negativ'] = visual.TextStim(self.win,
+                                             text='Negativt',
+                                             pos=[.5, -.7],
+                                             color=self.textCol)
         return stimuli
 
     def loadImageList(self):
@@ -191,7 +240,148 @@ class amp():
         self.stim['scale'].reset()
         return response
 
-    def runTrials(self, trialObj):
+    def runDual(self, trialObj):
+        from psychopy import event
+        self.crossFrames = int(self.frameR * self.crossTime)
+        self.imageFrames = int(self.frameR * self.imageTime)
+        self.blankFrames = int(self.frameR * self.blankTime)
+        self.pictoFrames = int(self.frameR * self.pictoTime)
+        self.maskFrames = int(self.frameR * self.maskTime)
+        trial = 0
+
+        for t in range(0, self.nTrials):
+            self.stim['image'].setImage('Payen2005IAPS/' +
+                                        trialObj['IAPSjpg'][t])
+            self.stim['pict'].setImage('Pictogram/' +
+                                       self.pictoType + '/' +
+                                       self.textCol + '/' +
+                                       trialObj['Pictogram'][t])
+
+            trial += 1
+            response = {}
+            response['Response'] = '0'
+            response['RT'] = ''
+            self.timer.reset()
+            self.stim['scale'].reset()
+            for frame in range(self.crossFrames):
+                self.stim['cross'].draw()
+                self.win.flip()
+            for frame in range(self.imageFrames):
+                self.stim['image'].draw()
+                self.win.flip()
+            for frame in range(self.blankFrames):
+                self.win.flip()
+            for frame in range(self.pictoFrames):
+                self.stim['pict'].draw()
+                self.win.flip()
+            for frame in range(self.maskFrames):
+                self.stim['mask'].draw()
+                self.stim['behagligt'].draw()
+                self.stim['obehagligt'].draw()
+                self.theseKeys = event.getKeys(keyList=['left', 'right'])
+                for thisKey in self.theseKeys:
+                    if thisKey == 'left':
+                        response['Response'] = '1'
+                        response['RT'] = str(self.timer.getTime())
+                        self.stim['spot'].setPos([-.5, -.8])
+                        self.theseKeys = []
+                    elif thisKey == 'right':
+                        response['Response'] = '-1'
+                        response['RT'] = str(self.timer.getTime())
+                        self.stim['spot'].setPos([.5, -.8])
+                        self.theseKeys = []
+                    self.stim['spot'].draw()
+
+                self.win.flip()
+
+            self.data['Trial'] = trial
+            self.data['Response'] = response['Response']
+            self.data['RT'] = response['RT']
+            self.data['IAPS.Number'] = trialObj['IAPS.Number'][t]
+            self.data['IAPSjpg'] = trialObj['IAPSjpg'][t]
+            self.data['Valence'] = trialObj['Valence'][t]
+            self.data['Pictogram'] = trialObj['Pictogram'][t]
+
+            self.log.append(self.data)
+
+            if event.getKeys(keyList=['escape']):
+                core.quit()
+
+    def runPayen(self, trialObj):
+        from psychopy import event
+        self.crossFrames = int(self.frameR * self.crossTime)
+        self.imageFrames = int(self.frameR * self.imageTime)
+        self.blankFrames = int(self.frameR * self.blankTime)
+        self.pictoFrames = int(self.frameR * self.pictoTime)
+        self.maskFrames = int(self.frameR * self.maskTime)
+        trial = 0
+
+        for t in range(0, self.nTrials):
+            self.stim['image'].setImage('Payen2005IAPS/' +
+                                        trialObj['IAPSjpg'][t])
+            self.stim['pict'].setImage('Pictogram/' +
+                                       self.pictoType + '/' +
+                                       self.textCol + '/' +
+                                       trialObj['Pictogram'][t])
+
+            trial += 1
+            response = {}
+            response['Response'] = '0'
+            response['RT'] = ''
+            self.timer.reset()
+            self.stim['scale'].reset()
+            for frame in range(self.crossFrames):
+                self.stim['cross'].draw()
+                self.win.flip()
+            for frame in range(self.imageFrames):
+                self.stim['image'].draw()
+                self.win.flip()
+            for frame in range(self.blankFrames):
+                self.win.flip()
+            for frame in range(self.pictoFrames):
+                self.stim['pict'].draw()
+                self.win.flip()
+
+            # for frame in range(self.maskFrames):
+            self.stim['mask'].draw()
+            self.stim['behagligt'].draw()
+            self.stim['obehagligt'].draw()
+            self.win.flip()
+            self.theseKeys = event.waitKeys(maxWait=6,
+                                            keyList=['left',
+                                                     'right',
+                                                     'escape'])
+            if self.theseKeys:
+                for thisKey in self.theseKeys:
+                    if thisKey == 'left':
+                        response['Response'] = '1'
+                        response['RT'] = str(self.timer.getTime())
+                        self.stim['spot'].setPos([-.5, -.8])
+
+                    elif thisKey == 'right':
+                        response['Response'] = '-1'
+                        response['RT'] = str(self.timer.getTime())
+                        self.stim['spot'].setPos([.5, -.8])
+
+                self.stim['spot'].draw()
+                self.theseKeys = []
+
+            self.win.flip()
+
+            self.data['Trial'] = trial
+            self.data['Response'] = response['Response']
+            self.data['RT'] = response['RT']
+            self.data['IAPS.Number'] = trialObj['IAPS.Number'][t]
+            self.data['IAPSjpg'] = trialObj['IAPSjpg'][t]
+            self.data['Valence'] = trialObj['Valence'][t]
+            self.data['Pictogram'] = trialObj['Pictogram'][t]
+
+            self.log.append(self.data)
+
+            if event.getKeys(keyList=['escape']):
+                core.quit()
+
+    def runLikert(self, trialObj):
         from psychopy import event
         self.crossFrames = int(self.frameR * self.crossTime)
         self.imageFrames = int(self.frameR * self.imageTime)
@@ -252,12 +442,19 @@ class amp():
         self.log.createFile(self.data)
 
         self.frameR = self.win.getActualFrameRate()
-        instructions.start(self.pictoType)
         if not self.frameR:
             self.frameR = 60.0
-        self.runTrials(self.trials)
+        if self.responseStyle == 'likert':
+            instructions.start(self.pictoType)
+            self.runLikert(self.trials)
+        elif self.responseStyle == 'dual':
+            instructions.start(self.pictoType + "2")
+            self.runDual(self.trials)
+        elif self.responseStyle == 'payen2005':
+            instructions.start(self.pictoType + "2")
+            self.runPayen(self.trials)
         instructions.start('end')
-        core.quit()
+        self.win.close()
 
 
 def kss():
@@ -273,9 +470,18 @@ gui = gui.GUI(expName='AMP')
 expinfo = gui.start()
 
 if expinfo != 'User pressed cancel':
-    run = amp(fullscreen=True, bgCol="black")
+    run = amp(fullscreen=True,
+              imageTime=0.075,
+              crossTime=1.000,
+              maskTime=6.000,
+              blankTime=0.125,
+              pictoTime=0.100,
+              responseStyle='payen2005',
+              bgCol="black")
+
     kss()
     run.startexp()
+    kss()
 
 # images = amp().loadImageList('Payen2005IAPS/Payen2005IAPS.txt')
 # print(images['IAPSjpg'][0:15])

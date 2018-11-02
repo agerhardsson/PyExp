@@ -1,0 +1,18 @@
+
+I det här testet är din uppgift att bedöma om du upplever ett antal
+japanska tecken som positiva eller negativa
+
+Innan varje tecken visas en emotionell bild. Försök att ignorera bilden
+och fokusera bedömningen på det japanska tecknet.
+
+Det går väldigt snabbt så var uppmärksam.
+
+Svara med piltangenterna:
+
+Positiv: Vänster
+Negativ: Höger
+Neutral: Inget svar
+
+Du har 2 sekunder på dig att svara.
+
+Tryck Mellanslag för att starta
