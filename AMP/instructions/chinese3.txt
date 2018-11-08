@@ -1,0 +1,18 @@
+
+I det här testet är din uppgift att bedöma om du upplever ett antal
+Kinesiska tecken som behagligt eller obehagligt.
+
+Innan varje tecken visas en emotionell bild. Försök att ignorera bilden
+och fokusera bedömningen på det Kinesiska tecknet.
+
+Det går väldigt snabbt så var uppmärksam.
+
+Svara med piltangenterna:
+
+Positiv: Vänster
+Negativ: Höger
+Neutral: Inget svar
+
+Du har 6 sekunder på dig att svara.
+
+Tryck Mellanslag för att starta

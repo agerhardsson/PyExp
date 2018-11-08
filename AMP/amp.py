@@ -50,7 +50,7 @@ class amp():
                  fullscreen=True,
                  winSize=(1280, 800),
                  imgSize=(1024, 768),
-                 nTrials=3,
+                 nTrials=48,
                  imageTime=0.075,
                  crossTime=1.000,
                  maskTime=2.000,
@@ -451,7 +451,7 @@ class amp():
             instructions.start(self.pictoType + "2")
             self.runDual(self.trials)
         elif self.responseStyle == 'payen2005':
-            instructions.start(self.pictoType + "2")
+            instructions.start(self.pictoType + "3")
             self.runPayen(self.trials)
         instructions.start('end')
         self.win.close()
