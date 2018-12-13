@@ -1,6 +1,10 @@
 #!/usr/bin/env/python
 # -*- coding: utf-8 -*-
 
+'''
+Script by Andreas Gerhardson (2018.12.13)
+'''
+
 import random
 import collections
 import time

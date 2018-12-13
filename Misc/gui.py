@@ -8,6 +8,7 @@ from psychopy import event, visual, core
 
 
 '''
+Script by Andreas Gerhardson (2018.12.13)
 To do:
 
 '''
