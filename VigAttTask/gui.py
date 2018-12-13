@@ -170,6 +170,6 @@ class ExperimentInfo():
 # ============================================================================
 # Example
 
-expInfo = ExperimentInfo()
-info = expInfo.run()
-print(info)
+# expInfo = ExperimentInfo()
+# info = expInfo.run()
+# print(info)
