@@ -8,6 +8,7 @@ from psychopy import event, visual, core
 
 
 '''
+Script by Andreas Gerhardson (2018.12.13)
 To do:
 
 '''
@@ -100,15 +101,20 @@ class ExperimentInfo():
         return self.win
 
     def checkSubject(self, dict):
+        if not os.path.exists(self.dataFolder):
+            dir = os.getcwd()
+        else:
+            dir = self.dataFolder
+
         checkFile = []
         for var in self.checkvars:
             checkFile.append(dict[var])
         checkFile = '_'.join(checkFile)
         listTest = []
-        for file in os.listdir(self.dataFolder):
+        for file in os.listdir(dir):
             if file.endswith('.txt'):
                 listTest.append(file[9:-4] != checkFile)
-        return(any(listTest))
+        return(all(listTest))
 
     def run(self):
         self.win = self.expWindow()
@@ -164,6 +170,6 @@ class ExperimentInfo():
 # ============================================================================
 # Example
 
-# expInfo = ExperimentInfo()
-# info = expInfo.run()
-# print(info)
+expInfo = ExperimentInfo()
+info = expInfo.run()
+print(info)
