@@ -11,6 +11,8 @@ __pycache__
 data/*
 !data/.keep
 
+# Ignore folders
+analysis
 Work bench
 
 # ignore image files

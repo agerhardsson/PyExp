@@ -102,9 +102,8 @@ class ExperimentInfo():
 
     def checkSubject(self, dict):
         if not os.path.exists(self.dataFolder):
-            dir = os.getcwd()
-        else:
-            dir = self.dataFolder
+            os.makedirs(self.dataFolder)
+        dir = self.dataFolder
 
         checkFile = []
         for var in self.checkvars:
@@ -149,6 +148,7 @@ class ExperimentInfo():
                         self.win.flip()
 
                     if event.getKeys(keyList=['escape']):
+                        print('User pressed cancel')
                         core.quit()
 
                 if not self.onlyNumeric:
