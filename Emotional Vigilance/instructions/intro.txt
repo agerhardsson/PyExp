@@ -1,0 +1,18 @@
+
+Det här är ett reaktionstest.
+
+Du kommer få se fixeringskors i mitten av skärmen. Fokusera på det.
+
+Till höger eller vänster om kommer två bilder visas snabbt, fortsätt fokusera
+på korset.
+
+Efter bilderna kommer en ring visas till höger eller vänster.
+
+Din uppgift är att svara på vilken sida ringen visades.
+Använd piltangenterna:
+Vänster
+Höger
+
+Svara så snabbt och korrekt som möjligt.
+
+(Tryck på mellanslag för att starta)
