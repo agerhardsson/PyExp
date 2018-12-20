@@ -1,1 +1,0 @@
-subject_id	Session	Task	Version	Date	Time	soa	Trial	side	Response	RT	
