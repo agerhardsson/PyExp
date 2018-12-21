@@ -27,6 +27,7 @@ class Vigilance():
                  bgCol='black',
                  textCol='white',
                  nTrials=40,
+                 feedback=True,
                  dataFolder='data/'):
 
         self.fullscreen = fullscreen
@@ -35,6 +36,7 @@ class Vigilance():
         self.textCol = textCol
         self.nTrials = nTrials
         self.dataFolder = dataFolder
+        self.feedback = feedback
 
         self.timer = core.Clock()
 
@@ -70,9 +72,13 @@ class Vigilance():
                                            height=2,
                                            units="deg",
                                            color=self.textCol)
+        stimuli['time'] = visual.TextStim(self.win,
+                                          text='o',
+                                          height=2,
+                                          units="deg",
+                                          color=self.textCol)
         stimuli['false'] = visual.TextStim(self.win,
                                            text='F',
-                                           pos=(0.0, -1),
                                            height=2,
                                            units="deg",
                                            color='red')
@@ -98,8 +104,8 @@ class Vigilance():
             dataDict = collections.OrderedDict()
             dataDict['subject_id'] = expinfo['subject_id']
             dataDict['session'] = expinfo['session']
-            dataDict['task'] = expinfo['expName']
             dataDict['version'] = expinfo['version']
+            dataDict['task'] = expinfo['expName']
             dataDict['date'] = time.strftime('%Y%m%d')
             dataDict['time'] = time.strftime('%H:%M:%S')
 
@@ -119,18 +125,18 @@ class Vigilance():
             trial += 1
             response = {}
             falseAlarm = False
-            response['Response'] = None
-            response['RT'] = None
-            self.stim['cross'].setColor(self.textCol)
-            self.stim['cross'].setAutoDraw(True)
-            self.win.flip()
+            response['response'] = None
+            response['rt'] = None
             self.stim['probe'].setPos(newPos=[side*12, 0])
 
             while eventTimer.getTime() > 0:
+                self.stim['cross'].draw()
+                self.win.flip()
                 if event.getKeys(keyList=['space']):
-                    self.stim['cross'].setColor('red')
+                    event.clearEvents()
+                    self.stim['false'].draw()
                     self.win.flip()
-                    core.wait(0.1)
+                    core.wait(0.5)
                     falseAlarm = True
                     break
             self.timer.reset()
@@ -138,25 +144,30 @@ class Vigilance():
                 self.stim['probe'].draw()
                 self.win.flip()
                 if event.getKeys(keyList=['space']):
-                    response['Response'] = 1
-                    response['RT'] = self.timer.getTime()
-                    self.win.flip()
+                    event.clearEvents()
+                    response['response'] = 1
+                    response['rt'] = self.timer.getTime()
+                    if self.feedback:
+                        self.stim['time'].setText(
+                            format(response['rt'], '4.3f'))
+                        self.stim['time'].draw()
+                        self.win.flip()
+                    core.wait(0.5)
                     break
 
                 if event.getKeys(keyList=['escape']):
                     core.quit()
 
             self.ISI.start(0.1)
-            self.data['Trial'] = trial
+            self.data['trial'] = trial
             self.data['soa'] = soa
             self.data['side'] = side
-            self.data['Response'] = response['Response']
-            self.data['RT'] = response['RT']
+            self.data['response'] = response['response']
+            self.data['rt'] = response['rt']
 
             self.log.append(self.data)
             self.ISI.complete()
-            # print(self.data)
-        self.stim['cross'].setAutoDraw(False)
+            self.win.flip()
 
     def startexp(self):
         self.win = self.expWindow()
