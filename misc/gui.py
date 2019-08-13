@@ -105,19 +105,10 @@ class ExperimentInfo():
             os.makedirs(self.dataFolder)
         dir = self.dataFolder
 
-        checkFile = []
-        for var in dict:
-            dict[var]
-            if type(dict[var]) == int:
-                format(dict[var], )
-            checkFile.append(dict[var])
-        checkFile = '_'.join(checkFile) + '.txt'
-
-        print(checkFile)
         listTest = []
         for file in os.listdir(dir):
             if file.endswith('.txt'):
-                listTest.append(file != checkFile)
+                listTest.append(file != dict['filename'])
         return(all(listTest))
 
     def run(self):
@@ -164,12 +155,20 @@ class ExperimentInfo():
 
             self.expInfo['date'] = time.strftime("%Y%m%d")
             self.expInfo['time'] = time.strftime("%H%M")
+
+            filename = []
+            for var in self.expInfo:
+                self.expInfo[var]
+                filename.append(self.expInfo[var])
+            self.expInfo['filename'] = '_'.join(filename) + '.txt'
+
             if self.checkSubject(self.expInfo):
                 return(self.expInfo)
             else:
                 self.stim['duplicate'].draw()
                 self.win.flip()
                 event.waitKeys(keyList=['return', 'space', 'escape'])
+                del self.expInfo['filename']
                 event.clearEvents()
                 core.wait(0.2)
                 continue
