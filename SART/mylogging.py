@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
 
 
 # Functions that control stimuli presentation ---------------------------------
@@ -18,7 +19,7 @@ class log():
             os.makedirs(self.directory)
 
         self.file = (self.directory +
-                     self.dataKeys['Date'] + "_" +
+                     time.strftime("%Y%m%d_%H%M%S") + "_" +
                      self.dataKeys['subject_id'] + "_" +
                      self.dataKeys['Version'] + "_" +
                      self.dataKeys['Session'] +

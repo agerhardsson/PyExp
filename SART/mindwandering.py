@@ -259,7 +259,7 @@ class mwDual():
 
     # Svenska
     # Var fanns din uppmärksamhet precis innan denna fråga?
-    # På uppgiften | Inte på uppgiften
+    # På uppgiften | Inte på uppgiften
 
     # Hur medveten var du om var din uppmärksamhet fanns?
     # Medveten | Inte medveten
@@ -483,7 +483,7 @@ class mwLikert():
 
     # Svenska
     # Var fanns din uppmärksamhet precis innan denna fråga?
-    # På uppgiften | Inte på uppgiften
+    # På uppgiften | Inte på uppgiften
 
     # Hur medveten var du om var din uppmärksamhet fanns?
     # Medveten | Inte medveten

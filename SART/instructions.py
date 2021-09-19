@@ -5,6 +5,82 @@ from psychopy import core
 import os
 import sys
 
+instText = dict()
+
+instText['sartintro'] = """
+
+I det här testet kommer du få se en siffra (1-9).
+Den kommer att visas en kort stund i mitten av skärmen.
+
+Siffran följs av en ikryssad cirkel.
+
+Din uppgift är att trycka med pekfingret för alla siffror UTOM siffran 3.
+
+Svara så snabbt och korrekt som möjligt.
+
+(Tryck på med pekfingret (röd) för att starta)
+
+"""
+
+instText['probeintro'] = """
+
+
+Under testets gång kommer du då och då bli avbruten med frågor om
+i vilken grad du var fokuserad på uppgiften och hur medveten du var om det.
+
+Du svarar genom att flytta markören till
+höger (pekfinger, röd) eller vänster (långfinger, grön)
+och bekräftar ditt svar med ringfingret (gul).
+"""
+
+instText['training'] = """
+
+Du kommer nu att få göra en kortare träningsomgång av uppgiften.
+
+Under denna träningsomgång får du feedback i form av
+ett rött kryss när du svarar fel.
+Dvs. när du trycker på siffran 3,
+eller inte trycker på någon av de andra siffrorna.
+
+Svara så snabbt och korrekt som möjligt.
+
+(Tryck på med pekfingret (röd) för att starta)
+
+"""
+
+instText['training2'] = """
+
+Bra. Nu fortsätter träningen, fast denna gång utan feedback.
+
+Svara så snabbt och korrekt som möjligt.
+
+(Tryck på med pekfingret (röd) för att starta)
+
+"""
+
+
+instText['task'] = """
+
+
+Nu startar det riktiga testet.
+
+Din uppgift är att trycka med pekfingret för alla siffror UTOM siffran 3.
+
+Svara så snabbt och korrekt som möjligt.
+
+(Tryck på med pekfingret (röd) för att starta)
+
+
+"""
+
+instText['end'] = """
+
+Nu är det här testet slut, tack!
+
+Tryck på valfri knapp för att avsluta.
+
+"""
+
 
 class instructions():
 
@@ -23,17 +99,18 @@ class instructions():
     def load_instructions(self):
         self.path = os.getcwd()
         directory = self.path + '/' + self.dir + '/'
-
-        instructionTextsDict = {}
-        for file in os.listdir(directory):
-            instr = file
-            name = file[:-4]
-            with open(directory + instr, 'r') as myfile:
-                if sys.version_info[0] >= 3:
-                    text = str(myfile.read())  # for python3
-                else:
-                    text = unicode(myfile.read(), 'UTF-8')  # for python2
-                instructionTextsDict[name] = text
+        
+        instructionTextsDict = instText
+#        instructionTextsDict = {}
+#        for file in os.listdir(directory):
+#            instr = file
+#            name = file[:-4]
+#            with open(directory + instr, 'r') as myfile:
+#                if sys.version_info[0] >= 3:
+#                    text = str(myfile.read())  # for python3
+#                else:
+#                    text = unicode(myfile.read(), 'UTF-8')  # for python2
+#                instructionTextsDict[name] = text
 
         return instructionTextsDict
 
@@ -46,7 +123,7 @@ class instructions():
         instruction_object = visual.TextStim(
             win=self.win,
             text='',
-            alignHoriz='center',
+            alignText='center',
             font=u'Arial',
             height=self.tSize,
             wrapWidth=self.wrapWidth,
