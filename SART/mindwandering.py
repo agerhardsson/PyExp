@@ -709,9 +709,9 @@ class mwLikert():
         self.win.flip()
         core.wait(0.2)
 
-        self.stimuli['continue'].draw()
-        self.win.flip()
-        core.wait(1.5)
+        # self.stimuli['continue'].draw()
+        # self.win.flip()
+        # core.wait(1.5)
         return response
 
 

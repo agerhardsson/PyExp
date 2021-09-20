@@ -18,7 +18,7 @@ Din uppgift är att trycka med pekfingret för alla siffror UTOM siffran 3.
 
 Svara så snabbt och korrekt som möjligt.
 
-(Tryck på med pekfingret (röd) för att starta)
+(Tryck <mellanslag> för att fortsätta)
 
 """
 
@@ -29,8 +29,8 @@ Under testets gång kommer du då och då bli avbruten med frågor om
 i vilken grad du var fokuserad på uppgiften och hur medveten du var om det.
 
 Du svarar genom att flytta markören till
-höger (pekfinger, röd) eller vänster (långfinger, grön)
-och bekräftar ditt svar med ringfingret (gul).
+höger <L> eller vänster <A>
+och bekräftar ditt svar med <mellanslag>.
 """
 
 instText['training'] = """
@@ -44,7 +44,7 @@ eller inte trycker på någon av de andra siffrorna.
 
 Svara så snabbt och korrekt som möjligt.
 
-(Tryck på med pekfingret (röd) för att starta)
+(Tryck <mellanslag> för att starta)
 
 """
 
@@ -54,7 +54,7 @@ Bra. Nu fortsätter träningen, fast denna gång utan feedback.
 
 Svara så snabbt och korrekt som möjligt.
 
-(Tryck på med pekfingret (röd) för att starta)
+(Tryck <mellanslag> för att starta)
 
 """
 
@@ -68,8 +68,14 @@ Din uppgift är att trycka med pekfingret för alla siffror UTOM siffran 3.
 
 Svara så snabbt och korrekt som möjligt.
 
-(Tryck på med pekfingret (röd) för att starta)
+(Tryck <mellanslag> för att starta)
 
+
+"""
+
+instText['continue'] = """
+
+Tryck <mellanslag> för att fortsätta
 
 """
 
@@ -98,9 +104,10 @@ class instructions():
 
     def load_instructions(self):
         self.path = os.getcwd()
-        directory = self.path + '/' + self.dir + '/'
-        
         instructionTextsDict = instText
+
+#        directory = self.path + '/' + self.dir + '/'
+#
 #        instructionTextsDict = {}
 #        for file in os.listdir(directory):
 #            instr = file

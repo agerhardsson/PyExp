@@ -1,8 +1,0 @@
-
-Nu startar det riktiga testet.
-
-Din uppgift är att trycka med pekfingret för alla siffror UTOM siffran 3.
-
-Svara så snabbt och korrekt som möjligt.
-
-(Tryck på med pekfingret (röd) för att starta)
